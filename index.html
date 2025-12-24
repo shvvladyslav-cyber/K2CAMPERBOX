@@ -1,1 +1,168 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>K2 CamperBox — Anfrage / Bestellung</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0a0f22">
+  <link rel="icon" href="/favicon.ico">
+
+  <style>
+    :root { color-scheme: dark; }
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; background:#070b16; color:#fff; }
+    .wrap { max-width: 920px; margin: 0 auto; padding: 24px; }
+    h1 { margin: 0 0 16px; font-size: 40px; }
+    .grid { display:grid; gap:16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin: 18px 0 24px; }
+    .card { background: #0a1023; border:1px solid rgba(255,255,255,.08); border-radius: 18px; padding: 18px; }
+    .price { font-size: 34px; font-weight: 800; margin: 6px 0 10px; }
+    .btn { appearance:none; border:0; border-radius: 12px; padding: 12px 14px; background:#2f7cff; color:#fff; font-weight:700; cursor:pointer; }
+    .btn:disabled { opacity:.6; cursor:not-allowed; }
+    label { display:block; font-size: 13px; opacity:.9; margin: 10px 0 6px; }
+    input, select, textarea {
+      width:100%; box-sizing:border-box; padding: 12px 12px; border-radius: 12px;
+      border:1px solid rgba(255,255,255,.12); background:#0a1023; color:#fff;
+      outline:none;
+    }
+    textarea { min-height: 90px; resize: vertical; }
+    .note { opacity:.8; font-size: 13px; margin-top: 10px; }
+    .status { margin-top: 12px; font-weight: 700; }
+    .ok { color:#7CFFB2; }
+    .err { color:#FF7C7C; }
+    .topnote { opacity:.85; margin-bottom: 14px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Modelle & Preise</h1>
+    <div class="topnote">
+      1) Введите данные → 2) Выберите пакет → 3) Отправьте заявку → 4) Она попадёт в Google Sheets (CRM).
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div style="font-weight:800;">K2 Basic</div>
+        <div class="price">329 €</div>
+        <div>Einfach, praktisch, ideal für Einsteiger.</div>
+        <ul>
+          <li>Ohne Umbau</li><li>Ohne Werkzeug</li><li>Schneller Aufbau</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div style="font-weight:800;">K2 Comfort</div>
+        <div class="price">549 €</div>
+        <div>Beste Balance: Komfort & Preis.</div>
+        <ul>
+          <li>Ohne Umbau</li><li>Ohne Werkzeug</li><li>Mehr Komfort</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div style="font-weight:800;">K2 Pro</div>
+        <div class="price">799 €</div>
+        <div>Maximale Ausstattung + Optionen.</div>
+        <ul>
+          <li>Premium-Material</li><li>Mehr Module</li><li>Optionen nach Wunsch</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin:0 0 10px;">Anfrage / Bestellung</h2>
+
+      <form id="leadForm">
+        <label>Ваше имя</label>
+        <input name="name" placeholder="Например: Владислав" required>
+
+        <label>Телефон (WhatsApp/Telegram)</label>
+        <input name="phone" placeholder="+49..." required>
+
+        <label>E-mail</label>
+        <input name="email" type="email" placeholder="name@email.com" required>
+
+        <label>Пакет</label>
+        <select name="paket" required>
+          <option value="">Выберите</option>
+          <option value="K2 Basic — 329€">K2 Basic — 329€</option>
+          <option value="K2 Comfort — 549€">K2 Comfort — 549€</option>
+          <option value="K2 Pro — 799€">K2 Pro — 799€</option>
+        </select>
+
+        <label>Марка/модель авто</label>
+        <input name="car" placeholder="VW Caddy 2016 / Berlingo / Combo..." required>
+
+        <label>Комментарий</label>
+        <textarea name="comment" placeholder="Например: хочу доставку, цвет, сроки..."></textarea>
+
+        <div style="display:flex; gap:12px; margin-top: 14px; flex-wrap:wrap;">
+          <button class="btn" id="submitBtn" type="submit">Отправить заявку</button>
+          <button class="btn" type="button" onclick="window.scrollTo({top:0, behavior:'smooth'})">Наверх</button>
+        </div>
+
+        <div class="note">* После отправки заявка уйдёт в Google Sheets (CRM).</div>
+        <div id="status" class="status"></div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // ====== ВСТАВЬ СЮДА URL своего Apps Script Web App (он должен заканчиваться на /exec) ======
+    const SCRIPT_URL = "PASTE_YOUR_APPS_SCRIPT_WEBAPP_URL_HERE";
+
+    const form = document.getElementById("leadForm");
+    const statusEl = document.getElementById("status");
+    const btn = document.getElementById("submitBtn");
+
+    function setStatus(text, ok=false){
+      statusEl.textContent = text;
+      statusEl.className = "status " + (ok ? "ok" : "err");
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      if (!SCRIPT_URL || SCRIPT_URL.includes("PASTE_YOUR")) {
+        setStatus("Ошибка: не вставлен SCRIPT_URL (URL Apps Script Web App).");
+        return;
+      }
+
+      btn.disabled = true;
+      setStatus("Отправляю...");
+
+      const data = Object.fromEntries(new FormData(form).entries());
+      data.page = location.href;
+      data.ts = new Date().toISOString();
+
+      try {
+        const body = new URLSearchParams(data);
+
+        const res = await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+          body
+        });
+
+        if (!res.ok) throw new Error("HTTP " + res.status);
+
+        form.reset();
+        setStatus("Готово! Заявка записана в CRM ✅", true);
+      } catch (err) {
+        setStatus("Не отправилось: " + err.message + " (см. 3.6: Ошибка 400).");
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // ===== PWA: регистрация Service Worker =====
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/sw.js").catch(()=>{});
+      });
+    }
+  </script>
+</body>
+</html>
 
