@@ -10,6 +10,11 @@
   <meta name="theme-color" content="#0a0f22">
   <link rel="icon" href="./favicon.ico">
 
+  <!-- iOS (не обязательно, но полезно) -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+
   <style>
     :root { color-scheme: dark; }
     body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; background:#070b16; color:#fff; }
@@ -109,8 +114,8 @@
   </div>
 
   <script>
-    // ВСТАВЬ сюда URL веб-приложения Apps Script (должен заканчиваться на /exec)
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby2CcU0SrmMEom6pzRRf4ftGRAc4buJizGZXYADD3afzZ_nNGnc67xXMUXrDhuhh_t-yA/exec";
+    // ====== 3.5 сюда вставь URL своего Apps Script Web App ======
+    const SCRIPT_URL = "PASTE_YOUR_APPS_SCRIPT_WEBAPP_URL_HERE";
 
     const form = document.getElementById("leadForm");
     const statusEl = document.getElementById("status");
@@ -125,7 +130,7 @@
       e.preventDefault();
 
       if (!SCRIPT_URL || SCRIPT_URL.includes("PASTE_YOUR")) {
-        setStatus("Ошибка: не вставлен SCRIPT_URL (URL Apps Script).");
+        setStatus("Ошибка: не вставлен SCRIPT_URL (URL Apps Script Web App).");
         return;
       }
 
@@ -145,18 +150,21 @@
           body
         });
 
+        // если вернул не 2xx — покажем код
         if (!res.ok) throw new Error("HTTP " + res.status);
 
+        // попробуем прочитать ответ (не всегда доступно из-за CORS)
+        // но даже если не прочиталось — запись часто уже ушла в таблицу
         form.reset();
         setStatus("Готово! Заявка записана в CRM ✅", true);
       } catch (err) {
-        setStatus("Не отправилось: " + err.message + ". Если 400 — см. пункт 3.6 (URL /exec, доступ Anyone, правильный Deploy).");
+        setStatus("Не отправилось: " + err.message + " — см. пункт 3.6 (Ошибка 400).");
       } finally {
         btn.disabled = false;
       }
     });
 
-    // PWA: регистрация Service Worker
+    // ===== PWA: регистрация Service Worker =====
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
         navigator.serviceWorker.register("./sw.js").catch(()=>{});
