@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>K2 CamperBox — Danke</title><link rel="stylesheet" href="assets/css/style.css"/></head>
+<body><div class="container"><div class="card">
+<h2>Danke!</h2>
+<p class="small">Deine Bestellung ist angekommen. Du erhältst eine Bestätigung per E-Mail.</p>
+<p class="notice">Order ID: <b id="oid">—</b></p>
+<a class="btn" href="bestellen.html">Neue Bestellung</a>
+<a class="btn secondary" href="./">Startseite</a>
+</div></div>
+<script>const p=new URLSearchParams(location.search);document.getElementById('oid').textContent=p.get('order')||'—';</script>
+</body></html>
