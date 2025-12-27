@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>Bestellen – K2 CamperBox</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+</head>
+<body>
+  <h2>K2 CamperBox – Comfort</h2>
+  <p>Basispreis: <b>549 €</b></p>
+
+  <h3>Extras</h3>
+  <label><input type="checkbox" data-price="89"> Komfortauflage (+89€)</label><br>
+  <label><input type="checkbox" data-price="39"> Transporttasche (+39€)</label><br>
+  <label><input type="checkbox" data-price="29"> Schnell-Aufbau Set (+29€)</label><br>
+
+  <p><b>Gesamtpreis: <span id="total">549</span> €</b></p>
+
+  <!-- ВСТАВЬ СЮДА СВОЮ STRIPE PAYMENT LINK -->
+  <button onclick="window.location.href='PASTE_STRIPE_PAYMENT_LINK'">
+    Zur Zahlung
+  </button>
+
+  <script>
+    const base = 549;
+    const boxes = document.querySelectorAll("input[type=checkbox]");
+    const total = document.getElementById("total");
+
+    function calc() {
+      let sum = base;
+      boxes.forEach(b => { if (b.checked) sum += Number(b.dataset.price); });
+      total.textContent = sum;
+    }
+    boxes.forEach(b => b.addEventListener("change", calc));
+  </script>
+</body>
+</html>
