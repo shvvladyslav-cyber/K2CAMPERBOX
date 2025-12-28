@@ -1,28 +1,24 @@
-/* sw.js — PWA cache (robust offline, won't fail on missing files) */
+/* sw.js — PWA cache (robust + offline gallery) */
 'use strict';
 
-const VERSION = 'v1.0.8';
+const VERSION = 'v1.0.6';
 const CACHE_NAME = `k2camperbox-${VERSION}`;
 
-/**
- * IMPORTANT:
- * Add here ONLY what реально существует на сервере.
- * Если файла нет — всё равно не упадёт (мы кешируем по одному).
- */
 const ASSETS = [
   '/',
   '/index.html',
   '/styles.css',
   '/app.js',
   '/manifest.json',
-
   '/favicon.ico',
+
   '/icons/icon-192.png',
   '/icons/icon-512.png',
 
   '/assets/logo.png',
   '/assets/revolut-qr.png',
 
+  // OFFLINE GALLERY (local)
   '/assets/gallery-1.jpg',
   '/assets/gallery-2.jpg',
   '/assets/gallery-3.jpg',
@@ -31,22 +27,25 @@ const ASSETS = [
   '/assets/gallery-6.jpg',
 ];
 
-async function cacheIndividually(cache, urls){
-  for(const url of urls){
+// helper: cache each asset safely (do not fail install if some 404)
+async function safeCacheAll(cache, urls){
+  const origin = self.location.origin;
+  const tasks = urls.map(async (u) => {
     try{
-      const req = new Request(url, { cache: 'reload' });
-      const res = await fetch(req);
-      if(res && res.ok) await cache.put(url, res.clone());
+      const url = new URL(u, origin).toString();
+      const res = await fetch(url, { cache: 'no-cache' });
+      if(res && res.ok) await cache.put(url, res);
     }catch(e){
-      // ignore missing or offline during install
+      // ignore missing/invalid assets to prevent install crash
     }
-  }
+  });
+  await Promise.all(tasks);
 }
 
 self.addEventListener('install', (event) => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE_NAME);
-    await cacheIndividually(cache, ASSETS);
+    await safeCacheAll(cache, ASSETS);
     await self.skipWaiting();
   })());
 });
@@ -59,45 +58,49 @@ self.addEventListener('activate', (event) => {
   })());
 });
 
-/**
- * Strategy:
- * - navigation: network-first -> cached /index.html fallback
- * - static: cache-first -> network fallback
- */
 self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET') return;
 
-  // Navigation requests
+  const url = new URL(req.url);
+
+  // Only handle same-origin
+  if (url.origin !== self.location.origin) return;
+
+  // Navigation: network-first, fallback to cached index.html
   if (req.mode === 'navigate') {
     event.respondWith((async () => {
       try{
         const res = await fetch(req);
-        const copy = res.clone();
         const cache = await caches.open(CACHE_NAME);
-        await cache.put('/index.html', copy);
+        cache.put('/index.html', res.clone()).catch(()=>{});
         return res;
       }catch(e){
         const cached = await caches.match('/index.html');
-        return cached || new Response('Offline', { status: 200, headers: { 'Content-Type':'text/plain; charset=utf-8' }});
+        return cached || new Response('Offline', { status: 200, headers:{'Content-Type':'text/plain; charset=utf-8'} });
       }
     })());
     return;
   }
 
-  // Cache-first for assets
+  // Assets: cache-first
   event.respondWith((async () => {
     const cached = await caches.match(req);
     if (cached) return cached;
 
     try{
       const res = await fetch(req);
-      const copy = res.clone();
-      const cache = await caches.open(CACHE_NAME);
-      await cache.put(req, copy);
+      if(res && res.ok){
+        const cache = await caches.open(CACHE_NAME);
+        cache.put(req, res.clone()).catch(()=>{});
+      }
       return res;
     }catch(e){
-      return cached || new Response('', { status: 504 });
+      // For images: return a tiny placeholder to avoid console spam
+      if(req.destination === 'image'){
+        return new Response('', { status: 200 });
+      }
+      return new Response('Offline', { status: 200, headers:{'Content-Type':'text/plain; charset=utf-8'} });
     }
   })());
 });
