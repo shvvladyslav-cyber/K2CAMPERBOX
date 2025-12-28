@@ -1,56 +1,41 @@
-/* sw.js — PWA cache (robust / safe) */
+/* sw.js — PWA cache (robust version, won't fail on missing files) */
 'use strict';
 
-const VERSION = 'v1.0.5';
+const VERSION = 'v1.0.8';
 const CACHE_NAME = `k2camperbox-${VERSION}`;
 
 /**
  * Важно:
- * - Если какого-то файла нет (404), cache.addAll падал и SW не ставился.
- * - Здесь: кэшируем "best-effort" (не валим установку).
+ * 1) Если что-то 404 (favicon, картинки и т.д.) — установка НЕ должна падать.
+ * 2) Поэтому мы не используем cache.addAll напрямую.
  */
-const ASSETS = [
-  '/',                // навигация
+const CORE = [
+  '/',
   '/index.html',
   '/manifest.json',
   '/styles.css',
   '/app.js',
-
-  // эти файлы могут быть не у всех — но теперь это НЕ сломает install
-  '/favicon.ico',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
-  '/assets/logo.png',
-  '/assets/revolut-qr.png',
-  '/assets/gallery-1.jpg',
-  '/assets/gallery-2.jpg',
-  '/assets/gallery-3.jpg',
-  '/assets/gallery-4.jpg',
+  // '/favicon.ico'  // <- если у тебя реально 404, лучше не кэшировать
 ];
 
-// best-effort caching (не падает на 404/Request failed)
-async function cacheBestEffort(cache, urls) {
-  const results = await Promise.allSettled(
-    urls.map(async (url) => {
-      try {
-        // cache.add делает fetch сам; но иногда "Request failed" (например, CORS/404)
-        // поэтому используем явный fetch и только потом put
-        const res = await fetch(url, { cache: 'no-cache' });
-        if (!res || !res.ok) throw new Error(`Skip ${url} (${res?.status})`);
-        await cache.put(url, res.clone());
-        return true;
-      } catch (e) {
-        return false;
-      }
-    })
-  );
-  return results;
+async function cacheSafe(urls) {
+  const cache = await caches.open(CACHE_NAME);
+  const results = await Promise.allSettled(urls.map(async (u) => {
+    const req = new Request(u, { cache: 'reload' });
+    const res = await fetch(req);
+    if (!res.ok) throw new Error(`Skip ${u} (${res.status})`);
+    await cache.put(u, res);
+    return true;
+  }));
+  // просто чтобы не было "unhandled"
+  results.forEach(() => {});
 }
 
 self.addEventListener('install', (event) => {
   event.waitUntil((async () => {
-    const cache = await caches.open(CACHE_NAME);
-    await cacheBestEffort(cache, ASSETS);
+    await cacheSafe(CORE);
     await self.skipWaiting();
   })());
 });
@@ -63,28 +48,22 @@ self.addEventListener('activate', (event) => {
   })());
 });
 
-// Сообщение для принудительного обновления
-self.addEventListener('message', (event) => {
-  if (event?.data === 'SKIP_WAITING') self.skipWaiting();
-});
-
 self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET') return;
 
   const url = new URL(req.url);
 
-  // Не трогаем чужие домены (шрифты Google и т.п.)
-  if (url.origin !== self.location.origin) return;
+  // Не трогаем расширения/аналитику/прочее — только http(s)
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') return;
 
-  // Навигация: сеть -> кэш -> fallback index
+  // Навигация: network-first, fallback to cached index
   if (req.mode === 'navigate') {
     event.respondWith((async () => {
       try {
         const res = await fetch(req);
-        const copy = res.clone();
         const cache = await caches.open(CACHE_NAME);
-        await cache.put('/index.html', copy);
+        cache.put('/index.html', res.clone()).catch(()=>{});
         return res;
       } catch (e) {
         const cached = await caches.match('/index.html');
@@ -94,18 +73,15 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Остальное: кэш -> сеть -> (опционально) кладем в кэш
+  // Статика: cache-first, update in background
   event.respondWith((async () => {
     const cached = await caches.match(req);
     if (cached) return cached;
 
     try {
       const res = await fetch(req);
-      // кэшируем только успешные ответы
-      if (res && res.ok) {
-        const cache = await caches.open(CACHE_NAME);
-        await cache.put(req, res.clone());
-      }
+      const cache = await caches.open(CACHE_NAME);
+      if (res && res.ok) cache.put(req, res.clone()).catch(()=>{});
       return res;
     } catch (e) {
       return cached || new Response('', { status: 504 });
