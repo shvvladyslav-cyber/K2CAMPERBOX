@@ -1,63 +1,70 @@
-/* sw.js — PWA cache (stable, no template literals) */
+/* sw.js — PWA cache (safe version) */
 'use strict';
 
-var VERSION = 'v1.0.5'; // поменяй версию — чтобы обновление точно прилетело
-var CACHE_NAME = 'k2camperbox-' + VERSION;
+const VERSION = 'v1.0.5'; // <- поднял версию, чтобы точно обновилось
+const CACHE_NAME = `k2camperbox-${VERSION}`;
 
-var ASSETS = [
+// Кэшируем только то, что реально есть на сайте
+const ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
   '/favicon.ico',
   '/icons/icon-192.png',
-  '/icons/icon-512.png'
+  '/icons/icon-512.png',
+  '/styles.css',
+  '/app.js',
+  '/assets/logo.png',
+  '/assets/revolut-qr.png',
+  // если есть картинки галереи:
+  '/assets/gallery-1.jpg',
+  '/assets/gallery-2.jpg',
+  '/assets/gallery-3.jpg',
+  '/assets/gallery-4.jpg',
 ];
 
-self.addEventListener('install', function (event) {
+self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(function (cache) { return cache.addAll(ASSETS); })
-      .then(function () { return self.skipWaiting(); })
+      .then((cache) => cache.addAll(ASSETS))
+      .then(() => self.skipWaiting())
   );
 });
 
-self.addEventListener('activate', function (event) {
+self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys()
-      .then(function (keys) {
-        return Promise.all(
-          keys.map(function (k) { return (k !== CACHE_NAME) ? caches.delete(k) : Promise.resolve(); })
-        );
-      })
-      .then(function () { return self.clients.claim(); })
+      .then((keys) => Promise.all(keys.map((k) => (k !== CACHE_NAME ? caches.delete(k) : null))))
+      .then(() => self.clients.claim())
   );
 });
 
-self.addEventListener('fetch', function (event) {
-  var req = event.request;
+self.addEventListener('fetch', (event) => {
+  const req = event.request;
   if (req.method !== 'GET') return;
 
-  // HTML навигация: сначала сеть, fallback на кэш
+  // HTML-навигация: сеть -> кэш
   if (req.mode === 'navigate') {
     event.respondWith(
       fetch(req)
-        .then(function (res) {
-          var copy = res.clone();
-          caches.open(CACHE_NAME).then(function (c) { c.put('/index.html', copy); });
+        .then((res) => {
+          const copy = res.clone();
+          caches.open(CACHE_NAME).then((c) => c.put('/index.html', copy));
           return res;
         })
-        .catch(function () { return caches.match('/index.html'); })
+        .catch(() => caches.match('/index.html'))
     );
     return;
   }
 
-  // Остальное: cache-first
+  // Остальное: кэш -> сеть
   event.respondWith(
-    caches.match(req).then(function (cached) {
+    caches.match(req).then((cached) => {
       if (cached) return cached;
-      return fetch(req).then(function (res) {
-        var copy = res.clone();
-        caches.open(CACHE_NAME).then(function (c) { c.put(req, copy); })["catch"](function () {});
+
+      return fetch(req).then((res) => {
+        const copy = res.clone();
+        caches.open(CACHE_NAME).then((c) => c.put(req, copy)).catch(() => {});
         return res;
       });
     })
