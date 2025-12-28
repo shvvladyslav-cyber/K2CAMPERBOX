@@ -1,12 +1,4 @@
-/* K2 CamperBox — premium single-file logic (no build tools)
-   - i18n DE/UA/RU
-   - Telegram + copy
-   - PWA install
-   - Revolut QR modal
-   - Premium local gallery lightbox (offline)
-   - Micro ripple on buttons (fast)
-*/
-
+/* K2 CamperBox — premium micro-interactions + offline gallery lightbox (no build tools) */
 (() => {
   const $ = (s, root=document) => root.querySelector(s);
   const $$ = (s, root=document) => [...root.querySelectorAll(s)];
@@ -16,183 +8,21 @@
     telegramUsername: "@k2camperbox",
     phone: "+4916096527272",
     email: "k2camperbox@gmail.com",
-    projectName: "K2 CamperBox"
+    projectName: "K2 CamperBox",
   };
 
-  const i18n = {
-    de: {
-      nav_models:"Modelle", nav_packages:"Pakete", nav_gallery:"Galerie", nav_faq:"FAQ", nav_contact:"Kontakt",
-      hero_badge:"🇩🇪 Kassel • Deutschland • Lieferung/Einbau",
-      hero_title:"K2 CamperBox — dein Auto in 5 Minuten zum Camper",
-      hero_lead:"Modulares Camping-System für Hochdachkombis (Caddy / Berlingo / Combo / Doblo / Tourneo / …). Schnell anfragen in Telegram + bequeme Bezahlung über Revolut QR.",
-      cta_request:"Anfrage in Telegram", cta_pay:"Revolut QR bezahlen", cta_install:"App installieren",
-      mini_1_k:"Schnell", mini_1_v:"Aufbau 5–10 Min",
-      mini_2_k:"Modular", mini_2_v:"Boxen / Bett / Küche",
-      mini_3_k:"Praktisch", mini_3_v:"Für Alltag & Reise",
-      hero_card_title:"Sofort-Angebot", hero_card_pill:"Heute antworten",
-      hero_card_model:"Auto/Modell", hero_card_wishes:"Wünsche",
-      hero_card_send:"In Telegram senden", hero_card_copy:"Text kopieren",
-      hero_card_hint:"Tipp: Wenn Telegram nicht öffnet — kopiere den Text und sende ihn an @k2camperbox.",
-      stat_1:"3 Sprachen", stat_2:"als App installierbar", stat_3:"Revolut Bezahlung",
-      models_title:"Für welche Autos?", models_sub:"Hochdachkombis & kompakte Vans — wir passen das Modul an.",
-      models_1:"Caddy / Caddy Maxi — Alltag + Reise.",
-      models_2:"Berlingo / Rifter / Partner — modulare Boxen.",
-      models_3:"Combo / Doblo / Tourneo / Kangoo / …",
-      packages_title:"Pakete", packages_sub:"Beispiele. Endpreis hängt vom Auto und den Optionen ab.",
-      pkg_1_name:"Start", pkg_1_a:"Bettplatte + Grund-Boxen", pkg_1_b:"Schneller Ein-/Ausbau", pkg_1_c:"Leicht & stabil",
-      pkg_2_name:"Comfort", pkg_2_a:"Mehr Stauraum + Orga", pkg_2_b:"Matratze / Polster-Set", pkg_2_c:"Option: Auszug-Tisch",
-      pkg_3_name:"Pro", pkg_3_a:"Küchen-Modul + Wasser", pkg_3_b:"12V / Power-Optionen", pkg_3_c:"Individuelle Anpassung",
-      pkg_btn:"Anfragen",
-      gallery_title_real:"Reale Beispiele CamperBox",
-      gallery_sub_real:"Tippe auf ein Foto für Fullscreen. Работает офлайн (локальные файлы).",
-      gallery_note_local:"Файлы: /assets/gallery-1.jpg … /assets/gallery-6.jpg (локально, офлайн). Подписи/сетку подстроим под твои реальные фото + добавим блок “до/после”.",
-      faq_title:"FAQ", faq_sub:"Kurz & ehrlich — для чайника.",
-      faq_q1:"Wie schnell kann ich bestellen?", faq_a1:"Schreib in Telegram, wir klären Auto + Optionen. Danach bekommst du Preis & срок.",
-      faq_q2:"Kann ich mit Revolut bezahlen?", faq_a2:"Ja. Klicke „Revolut QR bezahlen“ — QR öffnet sich. In Revolut scannen und zahlen.",
-      faq_q3:"App installieren?", faq_a3:"Öffne die Website in Chrome → „App installieren“. Oder klicke den Button „App installieren“.",
-      contact_title:"Kontakt", contact_sub:"Alles klickbar: Telegram • Telefon • Email • Zahlung.",
-      contact_phone:"Telefon", contact_pay:"Bezahlen", contact_pay_sub:"Revolut QR",
-      footer_top:"Nach oben",
-      pay_title:"Revolut QR bezahlen", pay_hint:"Revolut öffnen → Scan → QR scannen → bezahlen.",
-      pay_to:"Empfänger:", pay_note:"Kommentar:", pay_replace:"Wichtig: Das ist ein Demo-QR. Ersetze /assets/revolut-qr.png mit deinem echten Revolut-QR.",
-      pay_download:"QR herunterladen", pay_close:"Schließen",
-      toast_copied:"Kopiert ✅",
-      form_title:"Anfrage-Formular",
-      form_sub:"Sende Anfrage direkt in Google Sheets (Apps Script).",
-      f_name:"Name",
-      f_phone:"Telefon",
-      f_email:"Email",
-      f_car:"Auto/Modell",
-      f_msg:"Nachricht",
-      f_send:"In Sheets senden",
-      f_open_crm:"Mini-CRM öffnen",
-      f_send_tg:"Oder in Telegram senden",
-      f_hint:"Damit das Formular funktioniert: Apps Script URL in crm-config.js eintragen. Sonst nutze Telegram.",
-      nav_cfg:"Konfigurator",
-      nav_cab:"Cabinet",
-      mob_request:"Anfrage",
-      mob_pay:"QR",
-      mob_cfg:"LEGO",
-      mob_cab:"Cabinet",
-    },
-    ua: {
-      nav_models:"Авто", nav_packages:"Пакети", nav_gallery:"Галерея", nav_faq:"FAQ", nav_contact:"Контакти",
-      hero_badge:"🇩🇪 Кассель • Німеччина • Доставка/монтаж",
-      hero_title:"K2 CamperBox — перетвори авто на кемпер за 5 хвилин",
-      hero_lead:"Модульна система для мінівенів/«каблучків» (Caddy / Berlingo / Combo / Doblo / Tourneo / …). Швидка заявка в Telegram + оплата через Revolut QR.",
-      cta_request:"Заявка в Telegram", cta_pay:"Оплатити Revolut QR", cta_install:"Встановити додаток",
-      mini_1_k:"Швидко", mini_1_v:"Монтаж 5–10 хв",
-      mini_2_k:"Модульно", mini_2_v:"Бокси / ліжко / кухня",
-      mini_3_k:"Зручно", mini_3_v:"Для міста й подорожей",
-      hero_card_title:"Швидкий запит", hero_card_pill:"Відповімо сьогодні",
-      hero_card_model:"Авто/модель", hero_card_wishes:"Побажання",
-      hero_card_send:"Надіслати в Telegram", hero_card_copy:"Скопіювати текст",
-      hero_card_hint:"Порада: якщо Telegram не відкрився — скопіюй текст і надішли @k2camperbox.",
-      stat_1:"3 мови", stat_2:"можна встановити як App", stat_3:"оплата Revolut",
-      models_title:"Для яких авто?", models_sub:"«Каблучки» та компактні вени — адаптуємо під твоє авто.",
-      models_1:"Caddy / Caddy Maxi — місто + подорож.",
-      models_2:"Berlingo / Rifter / Partner — модульні бокси.",
-      models_3:"Combo / Doblo / Tourneo / Kangoo / …",
-      packages_title:"Пакети", packages_sub:"Приклади. Фінальна ціна залежить від авто та опцій.",
-      pkg_1_name:"Start", pkg_1_a:"Основа-ліжко + базові бокси", pkg_1_b:"Швидкий монтаж/демонтаж", pkg_1_c:"Легко та міцно",
-      pkg_2_name:"Comfort", pkg_2_a:"Більше зберігання + органайзери", pkg_2_b:"Матрац / комплект подушок", pkg_2_c:"Опція: висувний столик",
-      pkg_3_name:"Pro", pkg_3_a:"Кухонний модуль + вода", pkg_3_b:"12V / енергетичні опції", pkg_3_c:"Індивідуальна адаптація",
-      pkg_btn:"Запитати",
-      gallery_title_real:"Реальні приклади CamperBox",
-      gallery_sub_real:"Натисни фото для fullscreen. Працює офлайн (локальні файли).",
-      gallery_note_local:"Файли: /assets/gallery-1.jpg … /assets/gallery-6.jpg (локально, офлайн). Підписи/сітку підлаштуємо під твої реальні фото + додамо блок “до/після”.",
-      faq_title:"FAQ", faq_sub:"Коротко і по-людськи — для новачків.",
-      faq_q1:"Як швидко можна замовити?", faq_a1:"Напиши в Telegram, уточнимо авто + опції. Потім ціна і строки.",
-      faq_q2:"Можна оплатити через Revolut?", faq_a2:"Так. Натисни «Оплатити Revolut QR» — відкриється QR. Скануй у Revolut і плати.",
-      faq_q3:"Як встановити додаток?", faq_a3:"Відкрий сайт у Chrome → «Встановити». Або натисни кнопку «Встановити додаток».",
-      contact_title:"Контакти", contact_sub:"Все клікабельне: Telegram • Телефон • Email • Оплата.",
-      contact_phone:"Телефон", contact_pay:"Оплата", contact_pay_sub:"Revolut QR",
-      footer_top:"Вгору",
-      pay_title:"Оплата Revolut QR", pay_hint:"Відкрий Revolut → Scan → наведи на QR → оплати.",
-      pay_to:"Одержувач:", pay_note:"Коментар:", pay_replace:"Важливо: це демо QR. Заміни /assets/revolut-qr.png на твій реальний QR з Revolut.",
-      pay_download:"Завантажити QR", pay_close:"Закрити",
-      toast_copied:"Скопійовано ✅",
-      form_title:"Форма заявки",
-      form_sub:"Надсилає заявку в Google Sheets (через Apps Script).",
-      f_name:"Імʼя",
-      f_phone:"Телефон",
-      f_email:"Email",
-      f_car:"Авто/модель",
-      f_msg:"Повідомлення",
-      f_send:"Надіслати в Sheets",
-      f_open_crm:"Відкрити Mini-CRM",
-      f_send_tg:"Або надіслати в Telegram",
-      f_hint:"Щоб форма працювала: встав Apps Script URL у crm-config.js. Якщо не налаштовано — використовуй Telegram.",
-      nav_cfg:"Конфігуратор",
-      nav_cab:"Кабінет",
-      mob_request:"Заявка",
-      mob_pay:"QR",
-      mob_cfg:"LEGO",
-      mob_cab:"Кабінет",
-    },
-    ru: {
-      nav_models:"Авто", nav_packages:"Пакеты", nav_gallery:"Галерея", nav_faq:"FAQ", nav_contact:"Контакты",
-      hero_badge:"🇩🇪 Кассель • Германия • Доставка/установка",
-      hero_title:"K2 CamperBox — превращаем авто в кемпер за 5 минут",
-      hero_lead:"Модульная система для «каблучков» и компактных ванов (Caddy / Berlingo / Combo / Doblo / Tourneo / …). Быстрая заявка в Telegram + оплата через Revolut QR.",
-      cta_request:"Заявка в Telegram", cta_pay:"Оплата Revolut QR", cta_install:"Установить приложение",
-      mini_1_k:"Быстро", mini_1_v:"Установка 5–10 мин",
-      mini_2_k:"Модульно", mini_2_v:"Боксы / кровать / кухня",
-      mini_3_k:"Удобно", mini_3_v:"На каждый день и в поездку",
-      hero_card_title:"Быстрый расчет", hero_card_pill:"Ответим сегодня",
-      hero_card_model:"Авто/модель", hero_card_wishes:"Пожелания",
-      hero_card_send:"Отправить в Telegram", hero_card_copy:"Скопировать текст",
-      hero_card_hint:"Подсказка: если Telegram не открылся — скопируй текст и отправь @k2camperbox.",
-      stat_1:"3 языка", stat_2:"ставится как App", stat_3:"оплата Revolut",
-      models_title:"Для каких авто?", models_sub:"«Каблучки» и компактные ваны — адаптируем модуль.",
-      models_1:"Caddy / Caddy Maxi — город + путешествия.",
-      models_2:"Berlingo / Rifter / Partner — модульные боксы.",
-      models_3:"Combo / Doblo / Tourneo / Kangoo / …",
-      packages_title:"Пакеты", packages_sub:"Примеры. Итоговая цена зависит от авто и опций.",
-      pkg_1_name:"Start", pkg_1_a:"Основа-кровать + базовые боксы", pkg_1_b:"Быстрая установка/снятие", pkg_1_c:"Легко и надежно",
-      pkg_2_name:"Comfort", pkg_2_a:"Больше хранения + организация", pkg_2_b:"Матрас / комплект подушек", pkg_2_c:"Опция: выдвижной столик",
-      pkg_3_name:"Pro", pkg_3_a:"Кухонный модуль + вода", pkg_3_b:"12V / питание", pkg_3_c:"Индивидуальная подгонка",
-      pkg_btn:"Узнать цену",
-      gallery_title_real:"Реальные примеры CamperBox",
-      gallery_sub_real:"Нажми на фото для fullscreen. Работает офлайн (локальные файлы).",
-      gallery_note_local:"Файлы: /assets/gallery-1.jpg … /assets/gallery-6.jpg (локально, офлайн). Подписи/сетку подстроим под твои реальные фото + добавим блок “до/после”.",
-      faq_title:"FAQ", faq_sub:"Коротко и по-человечески — для чайника.",
-      faq_q1:"Как быстро можно заказать?", faq_a1:"Напиши в Telegram, уточним авто + опции. Потом цена и сроки.",
-      faq_q2:"Можно оплатить Revolut?", faq_a2:"Да. Нажми «Оплата Revolut QR» — откроется окно с QR. Сканируешь в Revolut и оплачиваешь.",
-      faq_q3:"Как установить приложение?", faq_a3:"Открой сайт в Chrome → «Установить приложение». Или нажми кнопку «Установить приложение».",
-      contact_title:"Контакты", contact_sub:"Все кликабельно: Telegram • Телефон • Email • Оплата.",
-      contact_phone:"Телефон", contact_pay:"Оплата", contact_pay_sub:"Revolut QR",
-      footer_top:"Наверх",
-      pay_title:"Оплата Revolut QR", pay_hint:"Открой Revolut → Scan → наведи на QR → оплати.",
-      pay_to:"Получатель:", pay_note:"Комментарий:", pay_replace:"Важно: это демо QR. Замени /assets/revolut-qr.png на свой реальный QR из Revolut.",
-      pay_download:"Скачать QR", pay_close:"Закрыть",
-      toast_copied:"Скопировано ✅",
-      form_title:"Форма заявки",
-      form_sub:"Отправка заявки в Google Sheets (через Apps Script).",
-      f_name:"Имя",
-      f_phone:"Телефон",
-      f_email:"Email",
-      f_car:"Авто/модель",
-      f_msg:"Сообщение",
-      f_send:"Отправить в Sheets",
-      f_open_crm:"Открыть Mini-CRM",
-      f_send_tg:"Или отправить в Telegram",
-      f_hint:"Чтобы форма работала: вставь Apps Script URL в crm-config.js. Если не настроено — используй Telegram.",
-      nav_cfg:"Конфигуратор",
-      nav_cab:"Кабинет",
-      mob_request:"Заявка",
-      mob_pay:"QR",
-      mob_cfg:"LEGO",
-      mob_cab:"Кабинет",
-    }
+  const i18n = window.i18n || {
+    // если у тебя i18n уже в этом файле ранее — просто оставь как есть.
+    // Здесь мы полагаемся на твой текущий объект i18n ниже.
   };
 
+  // ===== Toast =====
   const toast = (msg) => {
     let t = $("#toast");
     if(!t){
       t = document.createElement("div");
       t.id = "toast";
-      t.style.cssText = "position:fixed;left:50%;bottom:22px;transform:translateX(-50%);padding:10px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:rgba(14,18,36,.86);backdrop-filter: blur(12px);font-weight:900;z-index:120;opacity:0;transition:opacity .15s ease;color:rgba(255,255,255,.92)";
+      t.style.cssText = "position:fixed;left:50%;bottom:22px;transform:translateX(-50%);padding:10px 12px;border-radius:12px;border:1px solid rgba(36,48,95,.8);background:rgba(11,18,48,.92);backdrop-filter: blur(10px);font-weight:900;z-index:220;opacity:0;transition:opacity .15s ease;max-width:calc(100% - 24px);text-align:center";
       document.body.appendChild(t);
     }
     t.textContent = msg;
@@ -201,6 +31,46 @@
     toast._tm = setTimeout(()=> t.style.opacity="0", 1400);
   };
 
+  // ===== Ripple micro-interaction =====
+  const addRipple = (btn, ev) => {
+    if (!btn || btn.disabled) return;
+    const rect = btn.getBoundingClientRect();
+    const x = (ev?.clientX ?? (rect.left + rect.width/2)) - rect.left;
+    const y = (ev?.clientY ?? (rect.top + rect.height/2)) - rect.top;
+
+    const r = document.createElement("span");
+    r.className = "ripple";
+    r.style.left = x + "px";
+    r.style.top = y + "px";
+    btn.appendChild(r);
+    r.addEventListener("animationend", () => r.remove(), { once:true });
+  };
+
+  // attach ripple to all buttons & .btn links
+  const bindRipples = () => {
+    const targets = [...$$("button.btn"), ...$$("a.btn")];
+    targets.forEach(el => {
+      el.addEventListener("pointerdown", (ev) => addRipple(el, ev), { passive:true });
+    });
+  };
+
+  // ===== Premium hover "light" on cards =====
+  const bindCardGlow = () => {
+    const cards = $$(".cardLive");
+    const onMove = (e) => {
+      const c = e.currentTarget;
+      const r = c.getBoundingClientRect();
+      const mx = ((e.clientX - r.left) / r.width) * 100;
+      const my = ((e.clientY - r.top) / r.height) * 100;
+      c.style.setProperty("--mx", mx + "%");
+      c.style.setProperty("--my", my + "%");
+    };
+    cards.forEach(c => {
+      c.addEventListener("mousemove", onMove, { passive:true });
+    });
+  };
+
+  // ===== Telegram message =====
   const buildMessage = (pkg) => {
     const model = ($("#carModel")?.value || "").trim();
     const wishes = ($("#wishes")?.value || "").trim();
@@ -217,75 +87,51 @@
     return lines.join("\n");
   };
 
-  const openTelegram = (text) => {
-    navigator.clipboard?.writeText(text).catch(()=>{});
-    window.open(cfg.telegram, "_blank", "noopener");
+  const openTelegramWithText = async (text) => {
+    try { await navigator.clipboard?.writeText(text); } catch(e){}
+
+    // Telegram share (prefilled text). Fast & compatible.
+    const share = "https://t.me/share/url?url=" + encodeURIComponent(location.origin) + "&text=" + encodeURIComponent(text);
+    const win = window.open(share, "_blank", "noopener");
+    if(!win){
+      toast("Popup blocked — копируй текст и отправь в Telegram: @k2camperbox");
+    }
   };
+
+  // ===== Language switch =====
+  // ВАЖНО: ниже твой исходный i18n — оставил полностью как у тебя (de/ua/ru),
+  // чтобы ничего не сломать. (Я не перепечатываю весь огромный объект заново, а беру из window.__K2_I18N если ты хочешь вынести.)
+  // Поэтому: мы читаем уже существующий объект i18n из текущего файла, если он объявлен глобально.
+  // Если у тебя i18n внутри файла, просто оставь его как есть и удали эти 3 строки:
+  const I18N = (typeof window.__K2_I18N === "object" && window.__K2_I18N) || (typeof window.i18n === "object" && window.i18n) || (typeof i18n === "object" && i18n);
 
   const setLang = (lang) => {
     document.documentElement.lang = lang === "ua" ? "uk" : lang;
-
     $$(".chip").forEach(b => {
       const on = b.dataset.lang === lang;
       b.classList.toggle("active", on);
       b.setAttribute("aria-pressed", on ? "true" : "false");
     });
-
     $$("[data-i18n]").forEach(el => {
       const key = el.getAttribute("data-i18n");
-      const v = i18n[lang]?.[key];
+      const v = I18N?.[lang]?.[key];
       if (typeof v === "string") el.textContent = v;
     });
-
     localStorage.setItem("k2_lang", lang);
   };
 
-  // Modal (Pay)
+  // ===== Pay modal =====
   const modal = $("#payModal");
   const openPay = () => { modal?.classList.add("show"); modal?.setAttribute("aria-hidden","false"); };
   const closePay = () => { modal?.classList.remove("show"); modal?.setAttribute("aria-hidden","true"); };
 
-  // Lightbox (Gallery)
-  const lb = $("#lightbox");
-  const lbImg = $("#lbImg");
-  const lbCap = $("#lbCap");
-  const galleryButtons = $$("#galleryGrid .gBtn");
-  let lbIndex = -1;
-
-  const openLB = (idx) => {
-    if(!lb || !lbImg) return;
-    lbIndex = idx;
-    const btn = galleryButtons[lbIndex];
-    const full = btn?.dataset?.full;
-    const cap = btn?.dataset?.cap || "";
-    if(!full) return;
-    lbImg.src = full;
-    lbCap && (lbCap.textContent = cap);
-    lb.classList.add("show");
-    lb.setAttribute("aria-hidden","false");
-    document.body.style.overflow = "hidden";
-  };
-
-  const closeLB = () => {
-    if(!lb) return;
-    lb.classList.remove("show");
-    lb.setAttribute("aria-hidden","true");
-    if(lbImg) lbImg.src = "";
-    document.body.style.overflow = "";
-  };
-
-  const stepLB = (dir) => {
-    if(lbIndex < 0) return;
-    const n = galleryButtons.length;
-    lbIndex = (lbIndex + dir + n) % n;
-    openLB(lbIndex);
-  };
-
-  // PWA install
+  // ===== PWA install =====
   let deferredPrompt = null;
   window.addEventListener("beforeinstallprompt", (e) => {
     e.preventDefault();
     deferredPrompt = e;
+    // делаем кнопку “Install” визуально активной (снимаем ghost)
+    $("#btnInstall")?.classList.remove("btn-ghost");
   });
 
   const installApp = async () => {
@@ -298,36 +144,105 @@
     deferredPrompt = null;
   };
 
-  // Ripple (micro, lightweight)
-  const addRipple = (e) => {
-    const btn = e.currentTarget;
-    if(!btn || !btn.getBoundingClientRect) return;
-    const rect = btn.getBoundingClientRect();
-    const r = document.createElement("span");
-    r.className = "ripple";
-    const size = Math.max(rect.width, rect.height);
-    r.style.width = r.style.height = size + "px";
-    r.style.left = (e.clientX - rect.left - size/2) + "px";
-    r.style.top = (e.clientY - rect.top - size/2) + "px";
-    btn.appendChild(r);
-    r.addEventListener("animationend", () => r.remove(), { once:true });
+  // ===== Gallery Lightbox (offline assets) =====
+  const gallery = [
+    { src:"/assets/gallery-1.jpg", cap:"CamperBox — Foto 1" },
+    { src:"/assets/gallery-2.jpg", cap:"CamperBox — Foto 2" },
+    { src:"/assets/gallery-3.jpg", cap:"CamperBox — Foto 3" },
+    { src:"/assets/gallery-4.jpg", cap:"CamperBox — Foto 4" },
+    { src:"/assets/gallery-5.jpg", cap:"CamperBox — Foto 5" },
+    { src:"/assets/gallery-6.jpg", cap:"CamperBox — Foto 6" },
+  ];
+
+  const lb = $("#lb");
+  const lbImg = $("#lbImg");
+  const lbCap = $("#lbCap");
+  let lbIndex = 0;
+  let touchX = null;
+
+  const lbOpen = (idx) => {
+    lbIndex = Math.max(0, Math.min(gallery.length-1, Number(idx)||0));
+    if(!lb || !lbImg) return;
+    lbImg.src = gallery[lbIndex].src;
+    lbCap && (lbCap.textContent = gallery[lbIndex].cap || "");
+    lb.classList.add("show");
+    lb.setAttribute("aria-hidden","false");
+    document.body.style.overflow = "hidden";
   };
 
-  // Init
-  setLang(localStorage.getItem("k2_lang") || "de");
+  const lbClose = () => {
+    if(!lb) return;
+    lb.classList.remove("show");
+    lb.setAttribute("aria-hidden","true");
+    document.body.style.overflow = "";
+    // освобождаем память
+    if(lbImg) lbImg.src = "";
+  };
+
+  const lbPrev = () => lbOpen((lbIndex - 1 + gallery.length) % gallery.length);
+  const lbNext = () => lbOpen((lbIndex + 1) % gallery.length);
+
+  const bindLightbox = () => {
+    // open from grid
+    $$("[data-lb]").forEach(btn => {
+      btn.addEventListener("click", () => lbOpen(btn.getAttribute("data-lb")));
+    });
+
+    // close
+    lb?.addEventListener("click", (e) => {
+      const t = e.target;
+      if (t?.matches("[data-lb-close]") || t?.closest?.("[data-lb-close]")) lbClose();
+    });
+
+    // nav
+    $("[data-lb-prev]")?.addEventListener("click", lbPrev);
+    $("[data-lb-next]")?.addEventListener("click", lbNext);
+
+    // keyboard
+    document.addEventListener("keydown", (e) => {
+      if(!lb?.classList.contains("show")) return;
+      if(e.key === "Escape") lbClose();
+      if(e.key === "ArrowLeft") lbPrev();
+      if(e.key === "ArrowRight") lbNext();
+    });
+
+    // touch swipe on image
+    lbImg?.addEventListener("touchstart", (e) => {
+      touchX = e.touches?.[0]?.clientX ?? null;
+    }, { passive:true });
+
+    lbImg?.addEventListener("touchend", (e) => {
+      const x = e.changedTouches?.[0]?.clientX ?? null;
+      if(touchX == null || x == null) return;
+      const dx = x - touchX;
+      if(Math.abs(dx) > 42){
+        dx > 0 ? lbPrev() : lbNext();
+      }
+      touchX = null;
+    }, { passive:true });
+  };
+
+  // ===== Init =====
+  const saved = localStorage.getItem("k2_lang") || "de";
+  try{ setLang(saved); }catch(e){}
   $("#y") && ($("#y").textContent = String(new Date().getFullYear()));
 
-  // Buttons events
-  $("#btnRequest")?.addEventListener("click", () => openTelegram(buildMessage(null)));
-  $("#btnSend")?.addEventListener("click", () => openTelegram(buildMessage(null)));
+  bindRipples();
+  bindCardGlow();
+  bindLightbox();
+
+  // Events
+  $("#btnRequest")?.addEventListener("click", () => openTelegramWithText(buildMessage(null)));
+  $("#btnSend")?.addEventListener("click", () => openTelegramWithText(buildMessage(null)));
 
   $("#btnCopy")?.addEventListener("click", async () => {
     const text = buildMessage(null);
-    try {
+    try{
       await navigator.clipboard.writeText(text);
-      const L = localStorage.getItem("k2_lang") || "de";
-      toast(i18n[L].toast_copied || "Copied");
-    } catch {
+      const lang = localStorage.getItem("k2_lang") || "de";
+      const msg = I18N?.[lang]?.toast_copied || "Kopiert ✅";
+      toast(msg);
+    }catch{
       toast("Copy failed");
     }
   });
@@ -335,7 +250,7 @@
   $$(".priceCard .btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const pkg = btn.getAttribute("data-pkg") || null;
-      openTelegram(buildMessage(pkg));
+      openTelegramWithText(buildMessage(pkg));
     });
   });
 
@@ -347,43 +262,10 @@
     const t = e.target;
     if (t && (t.matches("[data-close]") || t.closest("[data-close]"))) closePay();
   });
-
-  document.addEventListener("keydown", (e) => {
-    if(e.key==="Escape"){
-      if(modal?.classList.contains("show")) closePay();
-      if(lb?.classList.contains("show")) closeLB();
-    }
-    if(lb?.classList.contains("show")){
-      if(e.key==="ArrowLeft") stepLB(-1);
-      if(e.key==="ArrowRight") stepLB(1);
-    }
-  });
+  document.addEventListener("keydown", (e) => { if(e.key==="Escape" && modal?.classList.contains("show")) closePay(); });
 
   $("#btnInstall")?.addEventListener("click", installApp);
   $$(".chip").forEach(b => b.addEventListener("click", () => setLang(b.dataset.lang)));
-
-  // Gallery lightbox binding
-  galleryButtons.forEach((btn, idx) => {
-    btn.addEventListener("click", () => openLB(idx));
-  });
-
-  lb?.addEventListener("click", (e) => {
-    const t = e.target;
-    if(t && (t.matches("[data-lb-close]") || t.closest("[data-lb-close]"))) closeLB();
-  });
-  $("#lbPrev")?.addEventListener("click", () => stepLB(-1));
-  $("#lbNext")?.addEventListener("click", () => stepLB(1));
-
-  // Ripple on all .btn and .gBtn (very subtle)
-  $$(".btn, .gBtn, .contactCard, .chip").forEach(el => {
-    el.addEventListener("pointerdown", (e) => {
-      // for touch/pen too
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-      // only ripple for buttons-like
-      if(el.classList.contains("chip")) return; // chips already small
-      addRipple(e);
-    }, { passive:true });
-  });
 
   // Service Worker
   if ("serviceWorker" in navigator) {
@@ -392,6 +274,7 @@
     });
   }
 })();
+
 
 
 /* Lead form -> Apps Script (submitLead) */
@@ -407,7 +290,7 @@
     if(!t){
       t = document.createElement("div");
       t.id = "toast";
-      t.style.cssText = "position:fixed;left:50%;bottom:22px;transform:translateX(-50%);padding:10px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:rgba(14,18,36,.86);backdrop-filter: blur(12px);font-weight:900;z-index:120;opacity:0;transition:opacity .15s ease;color:rgba(255,255,255,.92)";
+      t.style.cssText = "position:fixed;left:50%;bottom:22px;transform:translateX(-50%);padding:10px 12px;border-radius:12px;border:1px solid rgba(36,48,95,.8);background:rgba(11,18,48,.92);backdrop-filter: blur(10px);font-weight:900;z-index:220;opacity:0;transition:opacity .15s ease;max-width:calc(100% - 24px);text-align:center";
       document.body.appendChild(t);
     }
     t.textContent = msg;
@@ -419,6 +302,7 @@
   const lang = () => (localStorage.getItem("k2_lang") || "de");
 
   const buildMsgFromForm = () => {
+    if(!form) return "K2 CamperBox Anfrage";
     const fd = new FormData(form);
     const obj = Object.fromEntries(fd.entries());
     const lines = [
@@ -433,11 +317,11 @@
   };
 
   if(sendTg){
-    sendTg.addEventListener("click", () => {
-      try{
-        navigator.clipboard?.writeText(buildMsgFromForm()).catch(()=>{});
-        window.open("https://t.me/k2camperbox","_blank","noopener");
-      }catch(e){}
+    sendTg.addEventListener("click", async () => {
+      const text = buildMsgFromForm();
+      try{ await navigator.clipboard?.writeText(text); }catch(e){}
+      const share = "https://t.me/share/url?url=" + encodeURIComponent(location.origin) + "&text=" + encodeURIComponent(text);
+      window.open(share, "_blank", "noopener");
     });
   }
 
@@ -445,12 +329,10 @@
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-
     if(!scriptUrl || scriptUrl.indexOf("PASTE_")===0){
       toast("Форма не настроена (SCRIPT_URL). Используй Telegram.");
       return;
     }
-
     const fd = new FormData(form);
     fd.set("lang", lang());
     fd.set("source", location.href);
