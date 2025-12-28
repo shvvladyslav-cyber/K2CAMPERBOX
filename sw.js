@@ -20,7 +20,7 @@ const ASSETS = [
   "/cabinet.js",
   "/configurator.html",
   "/configurator.js",
-  "/assets/logo.svg",
+  "/assets/logo.png",
 ];
 
 

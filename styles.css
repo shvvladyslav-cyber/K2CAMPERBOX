@@ -344,7 +344,7 @@ statNum{}
   background: rgba(11,18,48,.55);
   display:grid;place-items:center;
 }
-.logoImg img{width:42px;height:42px;display:block}
+.logoImg img{width:42px;height:42px;display:block;object-fit:cover}
 
 /* Mobile quick actions */
 .mobileBar{
