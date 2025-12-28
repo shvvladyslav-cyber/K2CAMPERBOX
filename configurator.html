@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>K2 CamperBox — LEGO Konfigurator</title>
+  <meta name="theme-color" content="#0a0f22" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/index.html" aria-label="K2 CamperBox">
+      <span class="logoImg"><img src="/assets/logo.svg" alt="K2" width="42" height="42"/></span>
+      <span class="brandtext"><span class="name">CamperBox</span><span class="tag" data-i18n="cfg_tag">LEGO Konfigurator</span></span>
+    </a>
+    <nav class="nav" style="display:flex">
+      <a href="/cabinet.html" data-i18n="cfg_cab">Кабинет</a>
+      <a href="/crm.html" data-i18n="cfg_crm">CRM</a>
+      <a href="/index.html#request" data-i18n="cfg_form">Форма</a>
+      <a href="/impressum.html">Impressum</a>
+    </nav>
+    <div class="lang">
+      <button class="chip active" data-lang="de">DE</button>
+      <button class="chip" data-lang="ua">UA</button>
+      <button class="chip" data-lang="ru">RU</button>
+    </div>
+  </header>
+
+  <main class="wrap section">
+    <div class="sectionHead">
+      <h2 data-i18n="cfg_title">Конфигуратор (как LEGO)</h2>
+      <p class="muted" data-i18n="cfg_sub">Выбираешь авто + модули. Получаешь «комплект» и отправляешь заявку.</p>
+    </div>
+
+    <div class="grid3">
+      <div class="card" style="padding:14px">
+        <div class="label" data-i18n="cfg_vehicle">Авто</div>
+        <select class="input" id="vehicle">
+          <option value="VW Caddy">VW Caddy</option>
+          <option value="Caddy Maxi">VW Caddy Maxi</option>
+          <option value="Berlingo">Citroën Berlingo</option>
+          <option value="Rifter">Peugeot Rifter</option>
+          <option value="Combo">Opel Combo</option>
+          <option value="Doblo">Fiat Doblo</option>
+          <option value="Tourneo">Ford Tourneo</option>
+          <option value="Other">Other</option>
+        </select>
+
+        <div class="row" style="margin-top:10px">
+          <div class="label" data-i18n="cfg_notes">Пожелания</div>
+          <textarea class="input area" id="notes" placeholder="Бюджет, срок, цвет, материалы..."></textarea>
+        </div>
+
+        <div class="ctaRow" style="margin-top:10px">
+          <button class="btn primary" id="btnSendTelegram" data-i18n="cfg_send_tg">Отправить в Telegram</button>
+          <button class="btn" id="btnCopy" data-i18n="cfg_copy">Скопировать</button>
+        </div>
+      </div>
+
+      <div class="card" style="padding:14px">
+        <div class="label" data-i18n="cfg_modules">Модули (нажми чтобы добавить)</div>
+        <div class="legoGrid" id="moduleList"></div>
+        <div class="hint" style="margin-top:10px" data-i18n="cfg_hint">
+          Это «каркас» конфигуратора. Позже можно добавить 3D/схему авто и перетаскивание по зонам.
+        </div>
+      </div>
+
+      <div class="card" style="padding:14px">
+        <div class="label" data-i18n="cfg_your">Твоя сборка</div>
+        <div class="build" id="build"></div>
+        <div class="payInfo" style="margin-top:12px">
+          <div class="piRow"><span data-i18n="cfg_sum">Итого модулей:</span> <b id="count">0</b></div>
+          <div class="piRow"><span data-i18n="cfg_est">Оценка:</span> <b id="est">—</b></div>
+          <div class="piRow small" data-i18n="cfg_est_note">Оценка примерная (плейсхолдер). Реальная цена после уточнения авто/опций.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobileBar">
+      <a class="btn" href="/index.html#request" data-i18n="mob_request">Заявка</a>
+      <a class="btn" href="/cabinet.html" data-i18n="mob_cab">Кабинет</a>
+      <button class="btn primary" id="mobSend" data-i18n="cfg_send_tg">Отправить в Telegram</button>
+    </div>
+  </main>
+
+  <script src="/app.js"></script>
+  <script src="/configurator.js"></script>
+</body>
+</html>

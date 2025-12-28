@@ -1,0 +1,187 @@
+/**
+ * K2 CamperBox — Google Apps Script Backend (Web App)
+ * Features:
+ *  - Form submit -> Google Sheets (action=submitLead)
+ *  - List leads -> JSON (action=leads&status=NEW&limit=10)
+ *  - Update status (+1) -> POST JSON (action=updateStatus)
+ *
+ * Sheet columns:
+ * A: id
+ * B: createdAt
+ * C: status (NEW/IN_WORK/DONE)
+ * D: lang (de/ua/ru)
+ * E: name
+ * F: phone
+ * G: email
+ * H: carModel
+ * I: message
+ * J: source (optional)
+ *
+ * Setup:
+ * 1) Create Google Sheet "K2 CamperBox CRM"
+ * 2) Create sheet tab named "Leads"
+ * 3) Extensions -> Apps Script -> paste this file as Code.gs
+ * 4) Set SHEET_ID and SHEET_NAME below
+ * 5) Deploy -> New deployment -> Web app
+ *    - Execute as: Me
+ *    - Who has access: Anyone
+ * 6) Copy Web App URL and put it into crm-config.js on your site
+ */
+
+const SHEET_ID   = "PASTE_YOUR_SHEET_ID_HERE";
+const SHEET_NAME = "Leads";
+
+function doGet(e) {
+  const p = (e && e.parameter) ? e.parameter : {};
+  const action = (p.action || "").toLowerCase();
+
+  if (action === "ping") return json_({ ok: true, ts: new Date().toISOString() });
+
+  if (action === "leads") {
+    const status = (p.status || "NEW").toUpperCase();
+    const limit  = Math.min(parseInt(p.limit || "10", 10) || 10, 50);
+    const rows = getLeads_(status, limit);
+    return json_({ ok: true, status, limit, rows });
+  }
+
+  // Default: simple help
+  return json_({
+    ok: true,
+    usage: [
+      "?action=ping",
+      "?action=leads&status=NEW&limit=10",
+      "POST ?action=submitLead (form-urlencoded or JSON)",
+      "POST ?action=updateStatus (JSON: {id:'...', next:'IN_WORK'})"
+    ]
+  });
+}
+
+function doPost(e) {
+  const p = (e && e.parameter) ? e.parameter : {};
+  const action = (p.action || "").toLowerCase();
+
+  if (action === "submitlead") {
+    const payload = parseBody_(e);
+    const lead = addLead_(payload);
+    return json_({ ok: true, lead });
+  }
+
+  if (action === "updatestatus") {
+    const payload = parseBody_(e);
+    const id = String(payload.id || "");
+    const next = String(payload.next || "").toUpperCase();
+    const updated = updateStatus_(id, next);
+    return json_({ ok: updated, id, next });
+  }
+
+  return json_({ ok: false, error: "Unknown action" });
+}
+
+function getSheet_() {
+  if (!SHEET_ID || SHEET_ID.indexOf("PASTE_") === 0) {
+    throw new Error("Set SHEET_ID in Code.gs");
+  }
+  const ss = SpreadsheetApp.openById(SHEET_ID);
+  const sh = ss.getSheetByName(SHEET_NAME);
+  if (!sh) throw new Error("Sheet tab not found: " + SHEET_NAME);
+  return sh;
+}
+
+function getLeads_(status, limit) {
+  const sh = getSheet_();
+  const last = sh.getLastRow();
+  if (last < 2) return [];
+  const values = sh.getRange(2, 1, last - 1, 10).getValues(); // A..J
+  const out = [];
+  for (let i = values.length - 1; i >= 0 && out.length < limit; i--) {
+    const r = values[i];
+    const row = {
+      id: r[0],
+      createdAt: r[1],
+      status: r[2],
+      lang: r[3],
+      name: r[4],
+      phone: r[5],
+      email: r[6],
+      carModel: r[7],
+      message: r[8],
+      source: r[9]
+    };
+    if (!status || String(row.status).toUpperCase() === status) out.push(row);
+  }
+  return out;
+}
+
+function addLead_(p) {
+  const sh = getSheet_();
+  const id = "L" + Utilities.getUuid().replace(/-/g, "").slice(0, 12);
+  const createdAt = new Date();
+  const status = "NEW";
+  const lang = String(p.lang || "de");
+  const name = String(p.name || "");
+  const phone = String(p.phone || "");
+  const email = String(p.email || "");
+  const carModel = String(p.carModel || "");
+  const message = String(p.message || "");
+  const source = String(p.source || "");
+
+  // Header if empty
+  if (sh.getLastRow() === 0) {
+    sh.appendRow(["id","createdAt","status","lang","name","phone","email","carModel","message","source"]);
+  } else if (sh.getLastRow() === 1 && sh.getRange(1,1).getValue() === "") {
+    sh.getRange(1,1,1,10).setValues([["id","createdAt","status","lang","name","phone","email","carModel","message","source"]]);
+  }
+
+  sh.appendRow([id, createdAt, status, lang, name, phone, email, carModel, message, source]);
+  return { id, createdAt, status };
+}
+
+function updateStatus_(id, next) {
+  if (!id) return false;
+  const allowed = { NEW: true, IN_WORK: true, DONE: true };
+  if (!allowed[next]) return false;
+
+  const sh = getSheet_();
+  const last = sh.getLastRow();
+  if (last < 2) return false;
+  const ids = sh.getRange(2, 1, last - 1, 1).getValues(); // A
+  for (let i = 0; i < ids.length; i++) {
+    if (String(ids[i][0]) === id) {
+      sh.getRange(i + 2, 3).setValue(next); // column C status
+      return true;
+    }
+  }
+  return false;
+}
+
+function parseBody_(e) {
+  // Supports JSON or form-urlencoded
+  let data = {};
+  const ct = (e && e.postData && e.postData.type) ? e.postData.type : "";
+  const raw = (e && e.postData && e.postData.contents) ? e.postData.contents : "";
+  try {
+    if (ct.indexOf("application/json") >= 0 && raw) {
+      data = JSON.parse(raw);
+    } else if (raw) {
+      data = Object.fromEntries(raw.split("&").map(kv => {
+        const [k,v] = kv.split("=");
+        return [decodeURIComponent(k||""), decodeURIComponent((v||"").replace(/\+/g," "))];
+      }));
+    }
+  } catch (err) {
+    data = {};
+  }
+  // Merge URL parameters too
+  if (e && e.parameter) {
+    Object.keys(e.parameter).forEach(k => {
+      if (typeof data[k] === "undefined") data[k] = e.parameter[k];
+    });
+  }
+  return data;
+}
+
+function json_(obj) {
+  const out = ContentService.createTextOutput(JSON.stringify(obj));
+  out.setMimeType(ContentService.MimeType.JSON);
+  return out;
+}

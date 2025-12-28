@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>K2 CamperBox — Mini CRM</title>
+  <meta name="theme-color" content="#0a0f22" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/index.html" aria-label="K2 CamperBox">
+      <span class="logoImg"><img src="/assets/logo.svg" alt="K2" width="42" height="42"/></span>
+      <span class="brandtext"><span class="name">CamperBox</span><span class="tag">Mini CRM</span></span>
+    </a>
+    <nav class="nav" style="display:flex">
+      <a href="/index.html">Home</a>
+      <a href="/impressum.html">Impressum</a>
+      <a href="/datenschutz.html">Datenschutz</a>
+      <a href="/agb.html">AGB</a>
+    </nav>
+    <div class="lang">
+      <button class="chip active" data-lang="de">DE</button>
+      <button class="chip" data-lang="ua">UA</button>
+      <button class="chip" data-lang="ru">RU</button>
+    </div>
+  </header>
+
+  <main class="wrap section">
+    <div class="sectionHead">
+      <h2 data-i18n="crm_title">Mini-CRM</h2>
+      <p class="muted" data-i18n="crm_sub">Последние заявки из Google Sheets (без авторизации).</p>
+    </div>
+
+    <div class="card" style="padding:14px">
+      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between">
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn small" id="openCRM" data-i18n="crm_open">Открыть CRM</button>
+          <button class="btn small" id="openLeads" data-i18n="crm_open_leads">Открыть лист Leads</button>
+          <button class="btn small" id="openNew" data-i18n="crm_open_new">Открыть заявки NEW</button>
+        </div>
+
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <div class="badge" data-i18n="crm_status">Статус:</div>
+          <div class="lang" style="gap:8px">
+            <button class="chip active" data-status="NEW">NEW</button>
+            <button class="chip" data-status="IN_WORK">IN_WORK</button>
+            <button class="chip" data-status="DONE">DONE</button>
+          </div>
+          <button class="btn small" id="reload" data-i18n="crm_reload">Обновить</button>
+        </div>
+      </div>
+
+      <div style="margin-top:14px;border-top:1px solid rgba(36,48,95,.6);padding-top:14px">
+        <div class="muted" style="margin-bottom:8px" data-i18n="crm_hint">
+          Подсказка: кнопка “+1 статус” меняет NEW→IN_WORK→DONE прямо из таблицы.
+        </div>
+
+        <div style="overflow:auto">
+          <table class="table" id="tbl">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th data-i18n="t_created">Дата</th>
+                <th data-i18n="t_name">Имя</th>
+                <th data-i18n="t_phone">Телефон</th>
+                <th data-i18n="t_car">Авто</th>
+                <th data-i18n="t_msg">Сообщение</th>
+                <th data-i18n="t_status">Статус</th>
+                <th>+1</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="hint" style="margin-top:10px" data-i18n="crm_setup">
+          Чтобы заработало: вставь Apps Script URL в crm-config.js и задеплой Web App.
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/crm-config.js"></script>
+  <script src="/app.js"></script>
+  <script src="/crm.js"></script>
+</body>
+</html>

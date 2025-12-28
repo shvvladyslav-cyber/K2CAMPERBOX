@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>K2 CamperBox — Кабинет</title>
+  <meta name="theme-color" content="#0a0f22" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/index.html" aria-label="K2 CamperBox">
+      <span class="logoImg"><img src="/assets/logo.svg" alt="K2" width="42" height="42"/></span>
+      <span class="brandtext"><span class="name">CamperBox</span><span class="tag" data-i18n="cab_tag">Cabinet</span></span>
+    </a>
+
+    <nav class="nav" style="display:flex">
+      <a href="/index.html" data-i18n="cab_home">Home</a>
+      <a href="/configurator.html" data-i18n="cab_cfg">Konfigurator</a>
+      <a href="/crm.html" data-i18n="cab_crm">CRM</a>
+      <a href="/impressum.html">Impressum</a>
+    </nav>
+
+    <div class="lang">
+      <button class="chip active" data-lang="de" aria-pressed="true">DE</button>
+      <button class="chip" data-lang="ua" aria-pressed="false">UA</button>
+      <button class="chip" data-lang="ru" aria-pressed="false">RU</button>
+    </div>
+  </header>
+
+  <main class="wrap section">
+    <section class="section" style="padding-top:0">
+      <div class="sectionHead">
+        <h2 data-i18n="cab_title">Кабинет</h2>
+        <p class="muted" data-i18n="cab_sub">Быстрые кнопки + мини‑таблица последних заявок (как UHU.digital).</p>
+      </div>
+
+      <div class="grid3">
+        <a class="tile linkTile" href="/index.html#request">
+          <div class="tileIcon">📝</div>
+          <div class="tileTitle" data-i18n="cab_t1">Создать заявку</div>
+          <div class="tileText" data-i18n="cab_t1s">Форма → Google Sheets</div>
+        </a>
+
+        <a class="tile linkTile" href="https://t.me/k2camperbox" target="_blank" rel="noopener">
+          <div class="tileIcon">✈️</div>
+          <div class="tileTitle" data-i18n="cab_t2">Telegram</div>
+          <div class="tileText">@k2camperbox</div>
+        </a>
+
+        <a class="tile linkTile" href="/configurator.html">
+          <div class="tileIcon">🧩</div>
+          <div class="tileTitle" data-i18n="cab_t3">Конфигуратор</div>
+          <div class="tileText" data-i18n="cab_t3s">Собери модуль как LEGO</div>
+        </a>
+      </div>
+
+      <div class="card" style="padding:14px; margin-top:14px">
+        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between">
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn small" id="openCRM" data-i18n="cab_open_crm">Открыть CRM</button>
+            <button class="btn small" id="openLeads" data-i18n="cab_open_leads">Открыть Leads</button>
+            <button class="btn small" id="openNew" data-i18n="cab_open_new">Открыть NEW</button>
+            <a class="btn small" href="/crm.html" data-i18n="cab_open_crm_page">Страница CRM</a>
+          </div>
+
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <div class="badge" data-i18n="cab_status">Статус:</div>
+            <div class="lang" style="gap:8px">
+              <button class="chip active" data-status="NEW">NEW</button>
+              <button class="chip" data-status="IN_WORK">IN_WORK</button>
+              <button class="chip" data-status="DONE">DONE</button>
+            </div>
+            <button class="btn small" id="reload" data-i18n="cab_reload">Обновить</button>
+          </div>
+        </div>
+
+        <div style="margin-top:14px;border-top:1px solid rgba(36,48,95,.6);padding-top:14px">
+          <div class="muted" style="margin-bottom:8px" data-i18n="cab_hint">
+            Мини‑таблица последних 10 заявок. Кнопка “+1” меняет статус NEW→IN_WORK→DONE.
+          </div>
+
+          <div style="overflow:auto">
+            <table class="table" id="tbl">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th data-i18n="t_created">Дата</th>
+                  <th data-i18n="t_name">Имя</th>
+                  <th data-i18n="t_phone">Телефон</th>
+                  <th data-i18n="t_car">Авто</th>
+                  <th data-i18n="t_status">Статус</th>
+                  <th>+1</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+
+          <div class="hint" style="margin-top:10px" data-i18n="crm_setup">
+            Чтобы заработало: вставь Apps Script URL в crm-config.js и задеплой Web App.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="mobileBar">
+      <a class="btn primary" href="/index.html#request" data-i18n="mob_request">Заявка</a>
+      <button class="btn" id="mobPay" data-i18n="mob_pay">QR</button>
+      <a class="btn" href="/configurator.html" data-i18n="mob_cfg">LEGO</a>
+      <a class="btn" href="/cabinet.html" data-i18n="mob_cab">Кабинет</a>
+    </div>
+  </main>
+
+  <!-- Reuse Pay Modal from index by simple include -->
+  <div class="modal" id="payModal" aria-hidden="true">
+    <div class="modalBack" data-close></div>
+    <div class="modalCard" role="dialog" aria-modal="true" aria-labelledby="payTitle">
+      <div class="modalTop">
+        <div class="modalTitle" id="payTitle" data-i18n="pay_title">Revolut QR bezahlen</div>
+        <button class="x" data-close aria-label="Close">✕</button>
+      </div>
+      <div class="modalBody">
+        <div class="qrWrap">
+          <img src="/assets/revolut-qr.png" alt="Revolut QR" class="qr" />
+          <div class="qrHint" data-i18n="pay_hint">Открой Revolut → Scan → наведи на QR → оплати.</div>
+        </div>
+        <div class="modalActions" style="grid-template-columns:1fr">
+          <button class="btn primary full" data-close data-i18n="pay_close">Закрыть</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/crm-config.js"></script>
+  <script src="/app.js"></script>
+  <script src="/cabinet.js"></script>
+</body>
+</html>

@@ -1,42 +1,74 @@
-// sw.js
+// Simple offline-first Service Worker for K2 CamperBox
 const CACHE = "k2camperbox-v1";
 const ASSETS = [
   "/",
   "/index.html",
   "/styles.css",
   "/app.js",
-  "/config.js",
-  "/manifest.webmanifest",
-  "/offline.html",
-  "/assets/logo.svg",
+  "/manifest.json",
+  "/assets/revolut-qr.png",
   "/icons/icon-192.png",
   "/icons/icon-512.png"
+
+  "/crm.html",
+  "/crm.js",
+  "/crm-config.js",
+  "/impressum.html",
+  "/datenschutz.html",
+  "/agb.html"
+  "/cabinet.html",
+  "/cabinet.js",
+  "/configurator.html",
+  "/configurator.js",
+  "/assets/logo.svg",
 ];
 
-self.addEventListener("install", (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+
+// Install
+self.addEventListener("install", (event) => {
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE);
+    await cache.addAll(ASSETS);
+    self.skipWaiting();
+  })());
 });
 
-self.addEventListener("activate", (e) => {
-  e.waitUntil(
-    caches.keys().then(keys => Promise.all(keys.map(k => (k !== CACHE ? caches.delete(k) : null))))
-      .then(() => self.clients.claim())
-  );
+// Activate
+self.addEventListener("activate", (event) => {
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.map(k => (k !== CACHE ? caches.delete(k) : Promise.resolve())));
+    self.clients.claim();
+  })());
 });
 
-self.addEventListener("fetch", (e) => {
-  const req = e.request;
-  if (req.method !== "GET") return;
+// Fetch
+self.addEventListener("fetch", (event) => {
+  const req = event.request;
+  const url = new URL(req.url);
 
-  e.respondWith(
-    caches.match(req).then((cached) => {
-      if (cached) return cached;
+  // Only handle same-origin GET
+  if (req.method !== "GET" || url.origin !== location.origin) return;
 
-      return fetch(req).then((resp) => {
-        const copy = resp.clone();
-        caches.open(CACHE).then((c) => c.put(req, copy)).catch(()=>{});
-        return resp;
-      }).catch(() => caches.match("/offline.html"));
-    })
-  );
+  event.respondWith((async () => {
+    const cache = await caches.open(CACHE);
+    const cached = await cache.match(req);
+    if (cached) return cached;
+
+    try {
+      const fresh = await fetch(req);
+      // Cache static files
+      if (fresh.ok && (url.pathname.endsWith(".css") || url.pathname.endsWith(".js") || url.pathname.endsWith(".png") || url.pathname.endsWith(".json") || url.pathname === "/")) {
+        cache.put(req, fresh.clone());
+      }
+      return fresh;
+    } catch (e) {
+      // Fallback to cached index for navigation
+      if (req.mode === "navigate") {
+        const fallback = await cache.match("/index.html");
+        if (fallback) return fallback;
+      }
+      throw e;
+    }
+  })());
 });

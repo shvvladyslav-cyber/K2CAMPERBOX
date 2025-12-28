@@ -1,18 +1,30 @@
 {
   "id": "/?source=pwa",
-  "name": "K2 CamperBox",
+  "name": "K2 CamperBox — Anfrage / Bestellung",
   "short_name": "K2 CamperBox",
-  "description": "K2 CamperBox: модульный кемпинг-бокс. Заявка в Telegram/WhatsApp.",
+  "description": "K2 CamperBox: Camper-Modul fürs Auto. Anfrage in Telegram + Zahlung per Revolut QR.",
   "start_url": "/?source=pwa",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#070a18",
+  "background_color": "#0a0f22",
   "theme_color": "#0a0f22",
-  "lang": "ru",
+  "lang": "de",
   "orientation": "any",
-  "categories": ["business","travel","utilities"],
+  "categories": [
+    "business",
+    "productivity",
+    "travel"
+  ],
   "icons": [
-    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
   ]
 }
