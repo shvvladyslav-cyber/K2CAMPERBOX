@@ -3,853 +3,206 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>K2 CamperBox — модуль для кемпинга в авто (RU/UA/DE)</title>
-  <meta name="description" content="K2 CamperBox: компактный модуль кемпинга для авто. Быстрый расчет, заказ в 1 клик в Telegram. PWA-приложение." />
-  <meta name="theme-color" content="#0b1226" />
+  <title>K2 CamperBox — модульный кемпинг-бокс в авто | Kassel</title>
+  <meta name="description" content="K2 CamperBox: модульный кемпинг-бокс для Caddy, Berlingo, Combo и других авто. Заявка в 1 клик: Telegram/WhatsApp/звонок. PWA-приложение." />
+
+  <meta name="theme-color" content="#0a0f22" />
   <meta name="color-scheme" content="dark" />
 
-  <!-- Open Graph для красивого превью в Telegram/WhatsApp -->
-  <meta property="og:title" content="K2 CamperBox — модуль кемпинга в авто" />
-  <meta property="og:description" content="Расчет и заказ в 1 клик. Установка, доставка, опции. RU/UA/DE." />
+  <!-- OpenGraph -->
+  <meta property="og:title" content="K2 CamperBox — модульный кемпинг-бокс" />
+  <meta property="og:description" content="Быстро, удобно, под ключ. Заявка в Telegram/WhatsApp в 1 клик." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://k2camperbox.de/" />
-  <meta property="og:image" content="https://k2camperbox.de/icons/icon-512.png" />
 
-  <link rel="manifest" href="/manifest.json">
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.webmanifest">
   <link rel="icon" href="/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
 
-  <style>
-    :root{
-      --bg:#070b16;
-      --panel: rgba(255,255,255,.06);
-      --panel2: rgba(255,255,255,.09);
-      --text: rgba(255,255,255,.92);
-      --muted: rgba(255,255,255,.70);
-      --line: rgba(255,255,255,.12);
-      --shadow: 0 18px 50px rgba(0,0,0,.45);
-      --radius: 20px;
-      --accent1:#8b5cf6;
-      --accent2:#22c55e;
-      --accent3:#06b6d4;
-      --accent4:#f97316;
-      --danger:#ef4444;
-      --ok:#22c55e;
-      --btn:#ffffff;
-      --btnText:#0b1226;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family: system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
-      background:
-        radial-gradient(1000px 700px at 10% 10%, rgba(139,92,246,.35), transparent 60%),
-        radial-gradient(900px 650px at 90% 15%, rgba(6,182,212,.28), transparent 60%),
-        radial-gradient(900px 650px at 30% 95%, rgba(34,197,94,.22), transparent 60%),
-        radial-gradient(900px 650px at 85% 85%, rgba(249,115,22,.18), transparent 60%),
-        linear-gradient(180deg, #060913, #040716 40%, #030514);
-      color:var(--text);
-      overflow-x:hidden;
-    }
-    a{color:inherit}
-    .wrap{max-width:1120px;margin:0 auto;padding:18px 16px 60px}
-    .topbar{
-      display:flex;align-items:center;justify-content:space-between;gap:12px;
-      position:sticky;top:0;z-index:20;
-      padding:12px 10px;
-      backdrop-filter: blur(14px);
-      background: linear-gradient(180deg, rgba(7,11,22,.78), rgba(7,11,22,.35));
-      border:1px solid rgba(255,255,255,.10);
-      border-radius: 18px;
-      box-shadow: var(--shadow);
-      margin:12px 0 18px;
-    }
-    .brand{
-      display:flex;align-items:center;gap:12px;min-width:240px;
-    }
-    .logo{
-      width:44px;height:44px;border-radius:14px;
-      background:
-        radial-gradient(circle at 25% 25%, rgba(255,255,255,.22), transparent 35%),
-        linear-gradient(135deg, rgba(139,92,246,1), rgba(6,182,212,1));
-      box-shadow: 0 12px 30px rgba(0,0,0,.35);
-      border:1px solid rgba(255,255,255,.14);
-      position:relative;
-      overflow:hidden;
-    }
-    .logo:after{
-      content:"";
-      position:absolute;inset:-30%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,.25), transparent);
-      transform: rotate(25deg);
-      animation: shine 6s linear infinite;
-    }
-    @keyframes shine{
-      0%{transform: translateX(-40%) rotate(25deg)}
-      100%{transform: translateX(40%) rotate(25deg)}
-    }
-    .brand h1{font-size:14px;margin:0;line-height:1.2}
-    .brand p{font-size:12px;margin:2px 0 0;color:var(--muted)}
-    .right{
-      display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end;
-    }
-    .pill{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:10px 12px;border-radius:999px;
-      background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.12);
-    }
-    .langbtn{
-      border:0;cursor:pointer;
-      padding:9px 10px;border-radius:12px;
-      background:rgba(255,255,255,.08);
-      color:var(--text);
-      border:1px solid rgba(255,255,255,.14);
-    }
-    .langbtn.active{background:rgba(255,255,255,.18)}
-    .btn{
-      display:inline-flex;align-items:center;justify-content:center;gap:10px;
-      padding:12px 14px;border-radius:16px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(255,255,255,.10);
-      color:var(--text);
-      cursor:pointer;
-      text-decoration:none;
-      transition: transform .12s ease, background .12s ease;
-      user-select:none;
-      white-space:nowrap;
-    }
-    .btn:hover{transform: translateY(-1px);background:rgba(255,255,255,.14)}
-    .btn.primary{
-      background: linear-gradient(135deg, rgba(255,255,255,.95), rgba(255,255,255,.78));
-      color:var(--btnText);
-      border-color: rgba(255,255,255,.35);
-    }
-    .btn.primary:hover{transform: translateY(-1px) scale(1.01)}
-    .btn.danger{border-color: rgba(239,68,68,.4); background: rgba(239,68,68,.12)}
-    .grid{
-      display:grid;gap:14px;
-      grid-template-columns: 1.4fr .9fr;
-      align-items:stretch;
-    }
-    @media (max-width: 980px){
-      .grid{grid-template-columns:1fr}
-      .brand{min-width:auto}
-    }
-    .card{
-      border-radius: var(--radius);
-      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.05));
-      border: 1px solid rgba(255,255,255,.12);
-      box-shadow: var(--shadow);
-      overflow:hidden;
-      position:relative;
-    }
-    .card .inner{padding:18px}
-    .hero{
-      min-height: 360px;
-      display:flex;flex-direction:column;justify-content:space-between;
-      position:relative;
-      overflow:hidden;
-    }
-    .hero:before{
-      content:"";
-      position:absolute;inset:0;
-      background:
-        radial-gradient(800px 500px at 15% 25%, rgba(139,92,246,.35), transparent 55%),
-        radial-gradient(700px 420px at 80% 15%, rgba(6,182,212,.30), transparent 55%),
-        radial-gradient(700px 420px at 70% 90%, rgba(34,197,94,.22), transparent 55%);
-      pointer-events:none;
-    }
-    .hero .inner{position:relative;z-index:2}
-    .kicker{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:8px 10px;border-radius:999px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(255,255,255,.06);
-      color: var(--muted);
-      font-size:12px;
-      width:fit-content;
-    }
-    .title{
-      font-size: 34px;
-      line-height:1.05;
-      margin:12px 0 10px;
-      letter-spacing:-.02em;
-    }
-    @media (max-width: 420px){ .title{font-size:30px} }
-    .subtitle{color:var(--muted);font-size:14px;line-height:1.55;max-width: 62ch}
-    .heroActions{
-      display:flex;gap:10px;flex-wrap:wrap;margin-top:14px
-    }
-    .badges{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
-    .badge{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:10px 12px;border-radius:16px;
-      background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.12);
-      color:var(--muted);
-      font-size:13px;
-    }
-    .mini{
-      display:grid;gap:12px;
-      grid-template-columns:1fr;
-      height:100%;
-    }
-    .mini .card{height:100%}
-    .sectionTitle{
-      font-size:14px;margin:0 0 10px;
-      color: rgba(255,255,255,.85);
-      display:flex;align-items:center;justify-content:space-between;gap:10px;
-    }
-    .list{
-      display:grid;gap:10px;margin:0;padding:0;list-style:none
-    }
-    .li{
-      display:flex;gap:10px;align-items:flex-start;
-      padding:12px;border-radius:16px;
-      background:rgba(255,255,255,.05);
-      border:1px solid rgba(255,255,255,.10);
-    }
-    .dot{
-      width:10px;height:10px;border-radius:999px;margin-top:5px;
-      background: linear-gradient(135deg, var(--accent1), var(--accent3));
-      box-shadow: 0 0 0 4px rgba(255,255,255,.06);
-      flex:0 0 auto;
-    }
-    .li b{display:block;font-size:13px;margin-bottom:2px}
-    .li span{display:block;color:var(--muted);font-size:12px;line-height:1.45}
-    .cards3{
-      display:grid;gap:14px;margin-top:14px;
-      grid-template-columns: repeat(3, 1fr);
-    }
-    @media (max-width: 980px){ .cards3{grid-template-columns:1fr} }
-    .feature{
-      padding:16px;
-    }
-    .feature h3{margin:0 0 6px;font-size:14px}
-    .feature p{margin:0;color:var(--muted);font-size:12px;line-height:1.5}
-    .priceRow{
-      display:grid;gap:10px;
-      grid-template-columns:1fr 1fr;
-    }
-    @media (max-width: 980px){ .priceRow{grid-template-columns:1fr} }
-    .price{
-      padding:16px;
-      background: rgba(255,255,255,.05);
-      border:1px solid rgba(255,255,255,.10);
-      border-radius:18px;
-    }
-    .price .big{font-size:22px;margin:0 0 6px}
-    .price .small{color:var(--muted);font-size:12px;line-height:1.45;margin:0 0 10px}
-    .price .actions{display:flex;gap:10px;flex-wrap:wrap}
-    .footer{
-      margin-top:16px;
-      display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;
-      color:var(--muted);font-size:12px
-    }
-
-    .toast{
-      position:fixed;left:50%;bottom:18px;transform:translateX(-50%);
-      background: rgba(12,18,40,.88);
-      border:1px solid rgba(255,255,255,.14);
-      border-radius:18px;
-      padding:12px 12px;
-      box-shadow: var(--shadow);
-      display:none;
-      max-width: 92vw;
-      z-index:999;
-      backdrop-filter: blur(14px);
-    }
-    .toast .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between}
-    .toast b{font-size:13px}
-    .toast span{font-size:12px;color:var(--muted)}
-    .toast .btn{padding:10px 12px;border-radius:14px}
-    .kbd{
-      font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
-      font-size:12px;
-      padding:2px 6px;border-radius:8px;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
-      color: rgba(255,255,255,.85);
-    }
-  </style>
+  <link rel="stylesheet" href="/styles.css" />
 </head>
 
 <body>
-  <div class="wrap">
-    <header class="topbar">
-      <div class="brand">
-        <div class="logo" aria-hidden="true"></div>
-        <div>
-          <h1 id="t_brand">K2 CamperBox</h1>
-          <p id="t_tag">Кемпинг-модуль в авто • Быстрый расчет • Заказ в Telegram</p>
-        </div>
-      </div>
+  <div class="bg"></div>
 
-      <div class="right">
-        <div class="pill" aria-label="Language">
-          <button class="langbtn active" data-lang="ru">RU</button>
-          <button class="langbtn" data-lang="uk">UA</button>
-          <button class="langbtn" data-lang="de">DE</button>
-        </div>
-
-        <a class="btn" href="#prices" id="t_prices_btn">Цены</a>
-        <button class="btn" id="installBtn" style="display:none;">⬇️ <span id="t_install">Установить</span></button>
-        <a class="btn primary" id="ctaTop" href="https://t.me/YOUR_TELEGRAM" target="_blank" rel="noopener">💬 <span id="t_cta_top">Написать в Telegram</span></a>
-      </div>
-    </header>
-
-    <main class="grid">
-      <!-- HERO -->
-      <section class="card hero">
-        <div class="inner">
-          <div class="kicker" id="t_kicker">⚡ За 1 минуту: комплектация → расчет → заказ</div>
-          <h2 class="title" id="t_title">Сделай любой универсал “кемпером” — аккуратно, удобно и быстро</h2>
-          <p class="subtitle" id="t_subtitle">
-            K2 CamperBox — модуль для ночёвки и хранения: ровная площадка, ящики, кухня-опции, матрас.
-            Подходит для популярных авто (Caddy / Berlingo / Combo и др.). Работаем по Kassel и Германии.
-          </p>
-
-          <div class="heroActions">
-            <a class="btn primary" id="ctaMid" href="https://t.me/YOUR_TELEGRAM" target="_blank" rel="noopener">🚀 <span id="t_cta_mid">Получить расчет в Telegram</span></a>
-            <a class="btn" id="howBtn" href="#how">🧩 <span id="t_how_btn">Как это работает</span></a>
-            <button class="btn" id="copyLinkBtn">🔗 <span id="t_copy">Скопировать ссылку</span></button>
-          </div>
-
-          <div class="badges">
-            <div class="badge">✅ <span id="t_b1">Сборка за 1–3 дня</span></div>
-            <div class="badge">🧰 <span id="t_b2">Опции: кухня / ящики / стол</span></div>
-            <div class="badge">📦 <span id="t_b3">Доставка / установка</span></div>
-            <div class="badge">🛡️ <span id="t_b4">Аккуратно и надёжно</span></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- RIGHT колонка -->
-      <aside class="mini">
-        <section class="card">
-          <div class="inner">
-            <div class="sectionTitle">
-              <span id="t_fast">Быстрые действия</span>
-              <span class="kbd">PWA</span>
-            </div>
-
-            <div style="display:flex;gap:10px;flex-wrap:wrap">
-              <a class="btn" id="btnCatalog" href="#gallery">🖼️ <span id="t_gallery_btn">Галерея</span></a>
-              <a class="btn" id="btnFAQ" href="#faq">❓ <span id="t_faq_btn">FAQ</span></a>
-              <a class="btn" id="btnContact" href="#contact">📞 <span id="t_contact_btn">Контакты</span></a>
-            </div>
-
-            <div style="height:12px"></div>
-
-            <ul class="list">
-              <li class="li">
-                <span class="dot"></span>
-                <div>
-                  <b id="t_step1b">1) Напиши модель авто</b>
-                  <span id="t_step1s">Например: VW Caddy 2012 / Berlingo 2016 / Combo и т.д.</span>
-                </div>
-              </li>
-              <li class="li">
-                <span class="dot"></span>
-                <div>
-                  <b id="t_step2b">2) Выбери комплектацию</b>
-                  <span id="t_step2s">База / Comfort / Pro + опции (кухня, ящики, матрас)</span>
-                </div>
-              </li>
-              <li class="li">
-                <span class="dot"></span>
-                <div>
-                  <b id="t_step3b">3) Получи цену и сроки</b>
-                  <span id="t_step3s">Отвечаем быстро, можно с фото багажника</span>
-                </div>
-              </li>
-            </ul>
-
-            <div style="height:12px"></div>
-
-            <a class="btn primary" id="ctaSide" href="https://t.me/YOUR_TELEGRAM" target="_blank" rel="noopener">💬 <span id="t_cta_side">Заказать / спросить</span></a>
-            <p style="margin:10px 0 0;color:var(--muted);font-size:12px" id="t_side_note">
-              Заменишь ссылку <b>YOUR_TELEGRAM</b> на свой ник, и всё готово.
-            </p>
-          </div>
-        </section>
-      </aside>
-    </main>
-
-    <!-- FEATURES -->
-    <section class="cards3" id="how">
-      <article class="card feature">
-        <div class="inner">
-          <h3 id="t_f1t">📐 Под твою машину</h3>
-          <p id="t_f1d">Делаем под размеры багажника. Ровная поверхность + хранение, без “колхоза”.</p>
-        </div>
-      </article>
-      <article class="card feature">
-        <div class="inner">
-          <h3 id="t_f2t">🧠 Умная комплектация</h3>
-          <p id="t_f2d">База → Comfort → Pro. Добавляй опции: кухня, стол, ящики, матрас.</p>
-        </div>
-      </article>
-      <article class="card feature">
-        <div class="inner">
-          <h3 id="t_f3t">🚗 Быстро и аккуратно</h3>
-          <p id="t_f3d">Сборка 1–3 дня. Можно доставку и установку по Kassel/Германии.</p>
-        </div>
-      </article>
-    </section>
-
-    <!-- PRICES -->
-    <section class="card" id="prices" style="margin-top:14px">
-      <div class="inner">
-        <div class="sectionTitle">
-          <span id="t_prices">Цены и пакеты</span>
-          <span style="color:var(--muted);font-size:12px" id="t_prices_note">Цены примерные — точный расчет после модели авто</span>
-        </div>
-
-        <div class="priceRow">
-          <div class="price">
-            <p class="big" id="t_p1t">Base</p>
-            <p class="small" id="t_p1d">Ровная площадка + базовое хранение. Идеально “стартовать”.</p>
-            <div class="actions">
-              <a class="btn primary" href="https://t.me/YOUR_TELEGRAM" target="_blank" rel="noopener">💬 <span id="t_get_base">Рассчитать Base</span></a>
-              <button class="btn" data-copy="Base" onclick="copyPack(this)"><span id="t_copy_base">Скопировать</span></button>
-            </div>
-          </div>
-
-          <div class="price">
-            <p class="big" id="t_p2t">Comfort</p>
-            <p class="small" id="t_p2d">Больше ящиков, удобнее доступ, аккуратная фурнитура.</p>
-            <div class="actions">
-              <a class="btn primary" href="https://t.me/YOUR_TELEGRAM" target="_blank" rel="noopener">💬 <span id="t_get_comfort">Рассчитать Comfort</span></a>
-              <button class="btn" data-copy="Comfort" onclick="copyPack(this)"><span id="t_copy_comfort">Скопировать</span></button>
-            </div>
-          </div>
-
-          <div class="price">
-            <p class="big" id="t_p3t">Pro</p>
-            <p class="small" id="t_p3d">Максимум удобства + кухня/стол (по желанию), топ-компоновка.</p>
-            <div class="actions">
-              <a class="btn primary" href="https://t.me/YOUR_TELEGRAM" target="_blank" rel="noopener">💬 <span id="t_get_pro">Рассчитать Pro</span></a>
-              <button class="btn" data-copy="Pro" onclick="copyPack(this)"><span id="t_copy_pro">Скопировать</span></button>
-            </div>
-          </div>
-
-          <div class="price">
-            <p class="big" id="t_p4t">Опции</p>
-            <p class="small" id="t_p4d">Кухня / стол / матрас / подсветка / доп. ящики — добавим в расчет.</p>
-            <div class="actions">
-              <a class="btn primary" href="https://t.me/YOUR_TELEGRAM" target="_blank" rel="noopener">✨ <span id="t_get_opts">Подобрать опции</span></a>
-              <button class="btn" data-copy="Options" onclick="copyPack(this)"><span id="t_copy_opts">Скопировать</span></button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- GALLERY -->
-    <section class="card" id="gallery" style="margin-top:14px">
-      <div class="inner">
-        <div class="sectionTitle">
-          <span id="t_gallery">Галерея</span>
-          <span style="color:var(--muted);font-size:12px" id="t_gallery_note">Пока заглушки — добавишь свои фото в /img</span>
-        </div>
-
-        <div style="display:grid;gap:12px;grid-template-columns:repeat(3,1fr)">
-          <div class="card" style="min-height:140px;background:rgba(255,255,255,.05)"><div class="inner" style="color:var(--muted)">Фото 1</div></div>
-          <div class="card" style="min-height:140px;background:rgba(255,255,255,.05)"><div class="inner" style="color:var(--muted)">Фото 2</div></div>
-          <div class="card" style="min-height:140px;background:rgba(255,255,255,.05)"><div class="inner" style="color:var(--muted)">Фото 3</div></div>
-        </div>
-        <p style="margin:10px 0 0;color:var(--muted);font-size:12px" id="t_gallery_tip">
-          Совет: назови фото одинаково (например, <span class="kbd">img/1.jpg</span>, <span class="kbd">img/2.jpg</span>, <span class="kbd">img/3.jpg</span>) и заменим заглушки.
-        </p>
-      </div>
-    </section>
-
-    <!-- FAQ -->
-    <section class="card" id="faq" style="margin-top:14px">
-      <div class="inner">
-        <div class="sectionTitle"><span id="t_faq">FAQ</span></div>
-
-        <div style="display:grid;gap:10px">
-          <details class="card" style="background:rgba(255,255,255,.05)">
-            <summary style="cursor:pointer;padding:14px 16px" id="t_q1">Подходит ли под мою машину?</summary>
-            <div style="padding:0 16px 14px;color:var(--muted);font-size:12px" id="t_a1">
-              Да. Напиши модель/год и пришли фото багажника — скажем варианты.
-            </div>
-          </details>
-
-          <details class="card" style="background:rgba(255,255,255,.05)">
-            <summary style="cursor:pointer;padding:14px 16px" id="t_q2">Сколько времени изготовление?</summary>
-            <div style="padding:0 16px 14px;color:var(--muted);font-size:12px" id="t_a2">
-              Обычно 1–3 дня (зависит от очереди и опций).
-            </div>
-          </details>
-
-          <details class="card" style="background:rgba(255,255,255,.05)">
-            <summary style="cursor:pointer;padding:14px 16px" id="t_q3">Можно доставку/установку?</summary>
-            <div style="padding:0 16px 14px;color:var(--muted);font-size:12px" id="t_a3">
-              Да, по Kassel и по договоренности по Германии.
-            </div>
-          </details>
-        </div>
-      </div>
-    </section>
-
-    <!-- CONTACT -->
-    <section class="card" id="contact" style="margin-top:14px">
-      <div class="inner">
-        <div class="sectionTitle"><span id="t_contact">Контакты</span></div>
-
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <a class="btn primary" href="https://t.me/YOUR_TELEGRAM" target="_blank" rel="noopener">💬 Telegram</a>
-          <a class="btn" href="tel:+49YOURNUMBER">📞 <span id="t_call">Позвонить</span></a>
-          <a class="btn" href="mailto:YOURMAIL@example.com">✉️ Email</a>
-          <a class="btn" href="https://maps.google.com/?q=Kassel" target="_blank" rel="noopener">🗺️ Kassel</a>
-        </div>
-
-        <div class="footer">
-          <div>© <span id="year"></span> K2 CamperBox</div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-            <span id="t_pwa_hint">Совет: установи как приложение (кнопка “Установить”)</span>
-            <span class="kbd">v1.0</span>
-          </div>
-        </div>
-      </div>
-    </section>
-  </div>
-
-  <!-- install toast -->
-  <div class="toast" id="toast">
-    <div class="row">
-      <div>
-        <b id="t_toast_title">Установить приложение?</b><br/>
-        <span id="t_toast_sub">Будет как иконка на телефоне, работает быстрее.</span>
-      </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <button class="btn primary" id="toastInstall">⬇️ <span id="t_install2">Установить</span></button>
-        <button class="btn" id="toastClose">✖️ <span id="t_later">Позже</span></button>
+  <header class="top">
+    <div class="brand">
+      <img class="logo" src="/assets/logo.svg" alt="K2 CamperBox logo" />
+      <div class="brandText">
+        <div class="brandName">K2 CamperBox</div>
+        <div class="brandTag" data-i18n="tagline">Модульный кемпинг-бокс • быстро • красиво • под ключ</div>
       </div>
     </div>
-  </div>
 
-  <script>
-    // ====== НАСТРОЙКИ (меняешь под себя 2 минуты) ======
-    const CONFIG = {
-      TELEGRAM: "https://t.me/YOUR_TELEGRAM",
-      PHONE: "+49YOURNUMBER",
-      EMAIL: "YOURMAIL@example.com"
-    };
+    <div class="lang">
+      <button class="chip" data-lang="ru">RU</button>
+      <button class="chip" data-lang="ua">UA</button>
+      <button class="chip" data-lang="de">DE</button>
+    </div>
+  </header>
 
-    // Проставим ссылки
-    for (const id of ["ctaTop","ctaMid","ctaSide"]) {
-      const el = document.getElementById(id);
-      if (el) el.href = CONFIG.TELEGRAM;
-    }
-    document.querySelectorAll('a[href^="tel:"]').forEach(a => a.href = "tel:" + CONFIG.PHONE);
-    document.querySelectorAll('a[href^="mailto:"]').forEach(a => a.href = "mailto:" + CONFIG.EMAIL);
+  <main class="wrap">
+    <section class="hero card">
+      <div class="heroLeft">
+        <h1 data-i18n="h1">CamperBox в твой автомобиль — за 1 день</h1>
+        <p class="lead" data-i18n="lead">
+          Удобная модульная система для ночёвки и путешествий: ровная кровать, хранение, кухня-модуль, быстрая установка.
+        </p>
 
-    // ====== PWA SW ======
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker.register("/sw.js").catch(()=>{});
-      });
-    }
+        <div class="ctaRow">
+          <a class="btn primary" id="btnTelegram" href="#" rel="noopener" target="_blank">
+            <span class="btnIcon">✈️</span>
+            <span data-i18n="ctaTelegram">Написать в Telegram</span>
+          </a>
+          <a class="btn ghost" id="btnWhatsApp" href="#" rel="noopener" target="_blank">
+            <span class="btnIcon">💬</span>
+            <span data-i18n="ctaWhatsApp">Написать в WhatsApp</span>
+          </a>
+        </div>
 
-    // ====== INSTALL PROMPT ======
-    let deferredPrompt = null;
-    const installBtn = document.getElementById("installBtn");
-    const toast = document.getElementById("toast");
-    const toastInstall = document.getElementById("toastInstall");
-    const toastClose = document.getElementById("toastClose");
+        <div class="miniRow">
+          <a class="mini" id="btnCall" href="#"><span>📞</span> <span data-i18n="call">Позвонить</span></a>
+          <a class="mini" id="btnEmail" href="#"><span>✉️</span> <span data-i18n="email">Email</span></a>
+          <button class="mini" id="btnShare" type="button"><span>🔗</span> <span data-i18n="share">Поделиться</span></button>
+          <button class="mini" id="btnInstall" type="button" hidden><span>⬇️</span> <span data-i18n="install">Установить приложение</span></button>
+        </div>
 
-    window.addEventListener("beforeinstallprompt", (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      if (installBtn) installBtn.style.display = "inline-flex";
-      if (toast) toast.style.display = "block";
-    });
+        <div class="badges">
+          <div class="badge" data-i18n="b1">✅ Быстрое изготовление</div>
+          <div class="badge" data-i18n="b2">✅ Под размеры авто</div>
+          <div class="badge" data-i18n="b3">✅ Красиво и практично</div>
+        </div>
+      </div>
 
-    async function doInstall(){
-      if (!deferredPrompt) return;
-      deferredPrompt.prompt();
-      try { await deferredPrompt.userChoice; } catch(e){}
-      deferredPrompt = null;
-      if (installBtn) installBtn.style.display = "none";
-      if (toast) toast.style.display = "none";
-    }
-    installBtn?.addEventListener("click", doInstall);
-    toastInstall?.addEventListener("click", doInstall);
-    toastClose?.addEventListener("click", ()=> toast.style.display="none");
+      <div class="heroRight">
+        <div class="mock cardInner">
+          <div class="mockTop">
+            <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+            <div class="mockTitle" data-i18n="mockTitle">K2 CamperBox — конфигуратор</div>
+          </div>
 
-    // ====== Copy link / pack ======
-    const year = document.getElementById("year");
-    if (year) year.textContent = new Date().getFullYear();
+          <div class="grid">
+            <div class="tile">
+              <div class="tileIcon">🛏️</div>
+              <div class="tileTitle" data-i18n="t1">Спальное место</div>
+              <div class="tileText" data-i18n="t1d">Ровная кровать + матрас</div>
+            </div>
+            <div class="tile">
+              <div class="tileIcon">🧰</div>
+              <div class="tileTitle" data-i18n="t2">Хранение</div>
+              <div class="tileText" data-i18n="t2d">Ящики, ниши, органайзеры</div>
+            </div>
+            <div class="tile">
+              <div class="tileIcon">🍳</div>
+              <div class="tileTitle" data-i18n="t3">Кухня</div>
+              <div class="tileText" data-i18n="t3d">Столик, плита, вода (опция)</div>
+            </div>
+            <div class="tile">
+              <div class="tileIcon">⚡</div>
+              <div class="tileTitle" data-i18n="t4">Электрика</div>
+              <div class="tileText" data-i18n="t4d">USB/12V/LED (опция)</div>
+            </div>
+          </div>
 
-    function showQuick(msg){
-      // мини-уведомление через title (быстро и без лишнего кода)
-      const old = document.title;
-      document.title = "✅ " + msg;
-      setTimeout(()=> document.title = old, 1200);
-    }
+          <a class="btn wide" id="btnScrollForm" href="#leadForm">
+            <span class="btnIcon">🧾</span> <span data-i18n="ctaForm">Оставить заявку</span>
+          </a>
+        </div>
+      </div>
+    </section>
 
-    document.getElementById("copyLinkBtn")?.addEventListener("click", async ()=>{
-      try{
-        await navigator.clipboard.writeText(location.href);
-        showQuick("Ссылка скопирована");
-      }catch(e){
-        showQuick("Не удалось скопировать");
-      }
-    });
+    <section class="cards">
+      <div class="card">
+        <h2 data-i18n="forWho">Для каких авто?</h2>
+        <p data-i18n="forWhoText">VW Caddy, Berlingo, Combo, Kangoo и похожие. Сделаем под твои размеры.</p>
+        <div class="list">
+          <div class="li"><span>🚗</span> <span data-i18n="li1">Съёмный модуль — можно убрать за 10 минут</span></div>
+          <div class="li"><span>🧱</span> <span data-i18n="li2">Прочные материалы + аккуратная отделка</span></div>
+          <div class="li"><span>📦</span> <span data-i18n="li3">Хранение вещей и организация пространства</span></div>
+        </div>
+      </div>
 
-    window.copyPack = async function(btn){
-      const pack = btn?.getAttribute("data-copy") || "Pack";
-      const text = `K2 CamperBox — запрос: ${pack}\nМоя машина: (модель/год)\nГород: \nОпции: кухня/ящики/матрас/стол\nФото багажника: (да/нет)`;
-      try{
-        await navigator.clipboard.writeText(text);
-        showQuick("Текст для Telegram скопирован");
-      }catch(e){
-        showQuick("Не удалось скопировать");
-      }
-    }
+      <div class="card">
+        <h2 data-i18n="howWorks">Как это работает?</h2>
+        <div class="steps">
+          <div class="step"><div class="n">1</div><div><b data-i18n="s1">Пишешь нам</b><div class="muted" data-i18n="s1d">Telegram/WhatsApp/звонок</div></div></div>
+          <div class="step"><div class="n">2</div><div><b data-i18n="s2">Уточняем авто</b><div class="muted" data-i18n="s2d">модель, размеры, пожелания</div></div></div>
+          <div class="step"><div class="n">3</div><div><b data-i18n="s3">Делаем комплект</b><div class="muted" data-i18n="s3d">быстро и аккуратно</div></div></div>
+          <div class="step"><div class="n">4</div><div><b data-i18n="s4">Установка</b><div class="muted" data-i18n="s4d">и ты готов к путешествиям</div></div></div>
+        </div>
+      </div>
+    </section>
 
-    // ====== i18n ======
-    const T = {
-      ru: {
-        t_brand:"K2 CamperBox",
-        t_tag:"Кемпинг-модуль в авто • Быстрый расчет • Заказ в Telegram",
-        t_prices_btn:"Цены",
-        t_install:"Установить",
-        t_cta_top:"Написать в Telegram",
-        t_kicker:"⚡ За 1 минуту: комплектация → расчет → заказ",
-        t_title:"Сделай любой универсал “кемпером” — аккуратно, удобно и быстро",
-        t_subtitle:"K2 CamperBox — модуль для ночёвки и хранения: ровная площадка, ящики, кухня-опции, матрас. Подходит для популярных авто (Caddy / Berlingo / Combo и др.). Работаем по Kassel и Германии.",
-        t_cta_mid:"Получить расчет в Telegram",
-        t_how_btn:"Как это работает",
-        t_copy:"Скопировать ссылку",
-        t_b1:"Сборка за 1–3 дня",
-        t_b2:"Опции: кухня / ящики / стол",
-        t_b3:"Доставка / установка",
-        t_b4:"Аккуратно и надёжно",
-        t_fast:"Быстрые действия",
-        t_gallery_btn:"Галерея",
-        t_faq_btn:"FAQ",
-        t_contact_btn:"Контакты",
-        t_step1b:"1) Напиши модель авто",
-        t_step1s:"Например: VW Caddy 2012 / Berlingo 2016 / Combo и т.д.",
-        t_step2b:"2) Выбери комплектацию",
-        t_step2s:"База / Comfort / Pro + опции (кухня, ящики, матрас)",
-        t_step3b:"3) Получи цену и сроки",
-        t_step3s:"Отвечаем быстро, можно с фото багажника",
-        t_cta_side:"Заказать / спросить",
-        t_side_note:"Заменишь ссылку YOUR_TELEGRAM на свой ник, и всё готово.",
-        t_f1t:"📐 Под твою машину",
-        t_f1d:"Делаем под размеры багажника. Ровная поверхность + хранение, без “колхоза”.",
-        t_f2t:"🧠 Умная комплектация",
-        t_f2d:"База → Comfort → Pro. Добавляй опции: кухня, стол, ящики, матрас.",
-        t_f3t:"🚗 Быстро и аккуратно",
-        t_f3d:"Сборка 1–3 дня. Можно доставку и установку по Kassel/Германии.",
-        t_prices:"Цены и пакеты",
-        t_prices_note:"Цены примерные — точный расчет после модели авто",
-        t_p1t:"Base",
-        t_p1d:"Ровная площадка + базовое хранение. Идеально “стартовать”.",
-        t_get_base:"Рассчитать Base",
-        t_copy_base:"Скопировать",
-        t_p2t:"Comfort",
-        t_p2d:"Больше ящиков, удобнее доступ, аккуратная фурнитура.",
-        t_get_comfort:"Рассчитать Comfort",
-        t_copy_comfort:"Скопировать",
-        t_p3t:"Pro",
-        t_p3d:"Максимум удобства + кухня/стол (по желанию), топ-компоновка.",
-        t_get_pro:"Рассчитать Pro",
-        t_copy_pro:"Скопировать",
-        t_p4t:"Опции",
-        t_p4d:"Кухня / стол / матрас / подсветка / доп. ящики — добавим в расчет.",
-        t_get_opts:"Подобрать опции",
-        t_copy_opts:"Скопировать",
-        t_gallery:"Галерея",
-        t_gallery_note:"Пока заглушки — добавишь свои фото в /img",
-        t_gallery_tip:"Совет: назови фото одинаково (например, img/1.jpg, img/2.jpg, img/3.jpg) и заменим заглушки.",
-        t_faq:"FAQ",
-        t_q1:"Подходит ли под мою машину?",
-        t_a1:"Да. Напиши модель/год и пришли фото багажника — скажем варианты.",
-        t_q2:"Сколько времени изготовление?",
-        t_a2:"Обычно 1–3 дня (зависит от очереди и опций).",
-        t_q3:"Можно доставку/установку?",
-        t_a3:"Да, по Kassel и по договоренности по Германии.",
-        t_contact:"Контакты",
-        t_call:"Позвонить",
-        t_pwa_hint:"Совет: установи как приложение (кнопка “Установить”)",
-        t_toast_title:"Установить приложение?",
-        t_toast_sub:"Будет как иконка на телефоне, работает быстрее.",
-        t_install2:"Установить",
-        t_later:"Позже"
-      },
+    <section id="leadForm" class="card form">
+      <h2 data-i18n="formTitle">Заявка / Anfrage</h2>
+      <p class="muted" data-i18n="formNote">
+        Заполни 30 секунд — мы ответим в Telegram или WhatsApp.
+      </p>
 
-      uk: {
-        t_brand:"K2 CamperBox",
-        t_tag:"Кемпінг-модуль в авто • Швидкий розрахунок • Замовлення в Telegram",
-        t_prices_btn:"Ціни",
-        t_install:"Встановити",
-        t_cta_top:"Написати в Telegram",
-        t_kicker:"⚡ За 1 хвилину: комплектація → розрахунок → замовлення",
-        t_title:"Зроби будь-яке авто “кемпером” — акуратно, зручно і швидко",
-        t_subtitle:"K2 CamperBox — модуль для ночівлі та зберігання: рівна платформа, шухляди, кухня-опції, матрац. Підходить для популярних авто (Caddy / Berlingo / Combo тощо). Працюємо по Kassel та Німеччині.",
-        t_cta_mid:"Отримати розрахунок у Telegram",
-        t_how_btn:"Як це працює",
-        t_copy:"Скопіювати посилання",
-        t_b1:"Збірка за 1–3 дні",
-        t_b2:"Опції: кухня / шухляди / стіл",
-        t_b3:"Доставка / установка",
-        t_b4:"Акуратно та надійно",
-        t_fast:"Швидкі дії",
-        t_gallery_btn:"Галерея",
-        t_faq_btn:"FAQ",
-        t_contact_btn:"Контакти",
-        t_step1b:"1) Напиши модель авто",
-        t_step1s:"Наприклад: VW Caddy 2012 / Berlingo 2016 / Combo тощо",
-        t_step2b:"2) Обери комплектацію",
-        t_step2s:"Base / Comfort / Pro + опції (кухня, шухляди, матрац)",
-        t_step3b:"3) Отримай ціну та терміни",
-        t_step3s:"Відповідаємо швидко, можна з фото багажника",
-        t_cta_side:"Замовити / спитати",
-        t_side_note:"Заміниш YOUR_TELEGRAM на свій нік — і все готово.",
-        t_f1t:"📐 Під твоє авто",
-        t_f1d:"Робимо під розміри багажника. Рівна платформа + зберігання — без “колхозу”.",
-        t_f2t:"🧠 Розумна комплектація",
-        t_f2d:"Base → Comfort → Pro. Додавай опції: кухня, стіл, шухляди, матрац.",
-        t_f3t:"🚗 Швидко та акуратно",
-        t_f3d:"Збірка 1–3 дні. Доставка й установка по Kassel/Німеччині.",
-        t_prices:"Ціни та пакети",
-        t_prices_note:"Ціни орієнтовні — точний розрахунок після моделі авто",
-        t_p1t:"Base",
-        t_p1d:"Рівна платформа + базове зберігання. Ідеально для старту.",
-        t_get_base:"Розрахувати Base",
-        t_copy_base:"Скопіювати",
-        t_p2t:"Comfort",
-        t_p2d:"Більше шухляд, зручніший доступ, акуратна фурнітура.",
-        t_get_comfort:"Розрахувати Comfort",
-        t_copy_comfort:"Скопіювати",
-        t_p3t:"Pro",
-        t_p3d:"Максимум зручності + кухня/стіл (за бажанням), топ-компоновка.",
-        t_get_pro:"Розрахувати Pro",
-        t_copy_pro:"Скопіювати",
-        t_p4t:"Опції",
-        t_p4d:"Кухня / стіл / матрац / підсвітка / дод. шухляди — додамо до розрахунку.",
-        t_get_opts:"Підібрати опції",
-        t_copy_opts:"Скопіювати",
-        t_gallery:"Галерея",
-        t_gallery_note:"Поки заглушки — додаси свої фото в /img",
-        t_gallery_tip:"Порада: назви фото однаково (img/1.jpg, img/2.jpg, img/3.jpg) і замінимо заглушки.",
-        t_faq:"FAQ",
-        t_q1:"Чи підійде під моє авто?",
-        t_a1:"Так. Напиши модель/рік і надішли фото багажника — скажемо варіанти.",
-        t_q2:"Скільки часу виготовлення?",
-        t_a2:"Зазвичай 1–3 дні (залежить від черги та опцій).",
-        t_q3:"Можна доставку/установку?",
-        t_a3:"Так, по Kassel і за домовленістю по Німеччині.",
-        t_contact:"Контакти",
-        t_call:"Зателефонувати",
-        t_pwa_hint:"Порада: встанови як застосунок (кнопка “Встановити”)",
-        t_toast_title:"Встановити застосунок?",
-        t_toast_sub:"Буде як іконка на телефоні, працює швидше.",
-        t_install2:"Встановити",
-        t_later:"Пізніше"
-      },
+      <form id="form">
+        <div class="row">
+          <label>
+            <span data-i18n="fName">Имя</span>
+            <input name="name" autocomplete="name" required placeholder="Vlad / Anna" />
+          </label>
+          <label>
+            <span data-i18n="fCity">Город</span>
+            <input name="city" autocomplete="address-level2" placeholder="Kassel" />
+          </label>
+        </div>
 
-      de: {
-        t_brand:"K2 CamperBox",
-        t_tag:"Camping-Modul fürs Auto • Schnelle Kalkulation • Bestellung per Telegram",
-        t_prices_btn:"Preise",
-        t_install:"Installieren",
-        t_cta_top:"In Telegram schreiben",
-        t_kicker:"⚡ In 1 Minute: Ausstattung → Preis → Bestellung",
-        t_title:"Mach dein Auto zum Mini-Camper — sauber, bequem und schnell",
-        t_subtitle:"K2 CamperBox: Schlaf- & Staumodul mit flacher Liegefläche, Boxen, Küchen-Optionen, Matratze. Für viele Fahrzeuge (Caddy / Berlingo / Combo usw.). Kassel & ganz Deutschland.",
-        t_cta_mid:"Preis in Telegram anfragen",
-        t_how_btn:"So funktioniert’s",
-        t_copy:"Link kopieren",
-        t_b1:"Montage in 1–3 Tagen",
-        t_b2:"Optionen: Küche / Boxen / Tisch",
-        t_b3:"Lieferung / Einbau",
-        t_b4:"Sauber & robust",
-        t_fast:"Schnellaktionen",
-        t_gallery_btn:"Galerie",
-        t_faq_btn:"FAQ",
-        t_contact_btn:"Kontakt",
-        t_step1b:"1) Fahrzeugmodell senden",
-        t_step1s:"z.B. VW Caddy 2012 / Berlingo 2016 / Combo usw.",
-        t_step2b:"2) Paket wählen",
-        t_step2s:"Base / Comfort / Pro + Optionen (Küche, Boxen, Matratze)",
-        t_step3b:"3) Preis & Zeitplan bekommen",
-        t_step3s:"Schnelle Antwort, gern mit Kofferraum-Foto",
-        t_cta_side:"Bestellen / fragen",
-        t_side_note:"Ersetze YOUR_TELEGRAM durch deinen Nick — fertig.",
-        t_f1t:"📐 Für dein Auto",
-        t_f1d:"Maßgeschneidert für deinen Kofferraum. Flach + Stauraum, ohne Bastellook.",
-        t_f2t:"🧠 Smarte Pakete",
-        t_f2d:"Base → Comfort → Pro. Optionen: Küche, Tisch, Schubladen, Matratze.",
-        t_f3t:"🚗 Schnell & sauber",
-        t_f3d:"Fertigung 1–3 Tage. Lieferung & Einbau nach Absprache.",
-        t_prices:"Preise & Pakete",
-        t_prices_note:"Richtpreise — exakter Preis nach Fahrzeugmodell",
-        t_p1t:"Base",
-        t_p1d:"Fläche + Basis-Stauraum. Perfekt zum Start.",
-        t_get_base:"Base berechnen",
-        t_copy_base:"Kopieren",
-        t_p2t:"Comfort",
-        t_p2d:"Mehr Stauraum, besserer Zugriff, saubere Hardware.",
-        t_get_comfort:"Comfort berechnen",
-        t_copy_comfort:"Kopieren",
-        t_p3t:"Pro",
-        t_p3d:"Maximaler Komfort + Küche/Tisch (optional), Top-Layout.",
-        t_get_pro:"Pro berechnen",
-        t_copy_pro:"Kopieren",
-        t_p4t:"Optionen",
-        t_p4d:"Küche / Tisch / Matratze / Licht / extra Stauraum — wir kalkulieren mit.",
-        t_get_opts:"Optionen wählen",
-        t_copy_opts:"Kopieren",
-        t_gallery:"Galerie",
-        t_gallery_note:"Platzhalter — füge deine Fotos in /img hinzu",
-        t_gallery_tip:"Tipp: Benenne Fotos z.B. img/1.jpg, img/2.jpg, img/3.jpg — dann ersetzen wir die Platzhalter.",
-        t_faq:"FAQ",
-        t_q1:"Passt es in mein Auto?",
-        t_a1:"Ja. Sende Modell/Baujahr + Kofferraum-Foto — wir sagen dir die Optionen.",
-        t_q2:"Wie lange dauert es?",
-        t_a2:"Meist 1–3 Tage (abhängig von Optionen & Auslastung).",
-        t_q3:"Lieferung/Einbau möglich?",
-        t_a3:"Ja, in Kassel und nach Absprache deutschlandweit.",
-        t_contact:"Kontakt",
-        t_call:"Anrufen",
-        t_pwa_hint:"Tipp: Als App installieren (Button „Installieren“)",
-        t_toast_title:"App installieren?",
-        t_toast_sub:"Als Icon auf dem Handy, schneller im Zugriff.",
-        t_install2:"Installieren",
-        t_later:"Später"
-      }
-    };
+        <div class="row">
+          <label>
+            <span data-i18n="fCar">Авто (модель/год)</span>
+            <input name="car" required placeholder="VW Caddy 2016" />
+          </label>
+          <label>
+            <span data-i18n="fPhone">Телефон (WhatsApp)</span>
+            <input name="phone" inputmode="tel" placeholder="+49..." />
+          </label>
+        </div>
 
-    function applyLang(lang){
-      const dict = T[lang] || T.ru;
-      document.documentElement.lang = lang;
-      for (const [k,v] of Object.entries(dict)){
-        const el = document.getElementById(k);
-        if (el) el.textContent = v;
-      }
-      // активная кнопка
-      document.querySelectorAll(".langbtn").forEach(b=>{
-        b.classList.toggle("active", b.dataset.lang === lang);
-      });
-      localStorage.setItem("k2_lang", lang);
-    }
+        <label>
+          <span data-i18n="fWish">Что нужно?</span>
+          <textarea name="wish" rows="4" placeholder="Кровать + хранение + кухня (опция)"></textarea>
+        </label>
 
-    document.querySelectorAll(".langbtn").forEach(btn=>{
-      btn.addEventListener("click", ()=> applyLang(btn.dataset.lang));
-    });
+        <div class="row">
+          <button class="btn primary wide" type="submit">
+            <span class="btnIcon">🚀</span>
+            <span data-i18n="fSend">Отправить заявку</span>
+          </button>
+        </div>
 
-    const saved = localStorage.getItem("k2_lang") || "ru";
-    applyLang(saved);
-  </script>
+        <div id="formMsg" class="msg" role="status" aria-live="polite"></div>
+        <div class="muted small">
+          <span data-i18n="privacy">Мы используем данные только чтобы связаться с вами.</span>
+        </div>
+      </form>
+
+      <div class="adminLinks" id="adminLinks" hidden>
+        <div class="hr"></div>
+        <div class="muted small" data-i18n="admin">Админ-кнопки (если ты указал ссылки в config.js)</div>
+        <div class="miniRow">
+          <a class="mini" id="btnOpenCRM" href="#" target="_blank" rel="noopener">📋 Open CRM</a>
+          <a class="mini" id="btnOpenNew" href="#" target="_blank" rel="noopener">🟢 NEW Leads</a>
+        </div>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <div class="footCard">
+        <div class="muted small">
+          © <span id="year"></span> K2 CamperBox •
+          <a id="footEmail" href="#">k2camperbox@gmail.com</a> •
+          <a id="footPhone" href="#">+49 160 96527272</a>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <script src="/config.js"></script>
+  <script src="/app.js"></script>
 </body>
 </html>
-
