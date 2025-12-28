@@ -19,18 +19,19 @@
 
   <link rel="stylesheet" href="/styles.css" />
 </head>
+
 <body>
-  <div class="bg" aria-hidden="true">
-    <div class="glow g1"></div>
-    <div class="glow g2"></div>
-    <div class="glow g3"></div>
+  <div class="bg">
+    <div class="mesh m1"></div>
+    <div class="mesh m2"></div>
+    <div class="mesh m3"></div>
     <div class="grain"></div>
   </div>
 
   <header class="topbar">
     <a class="brand" href="#top" aria-label="K2 CamperBox">
       <span class="logoImg">
-        <img src="/assets/logo.png" alt="K2 CamperBox" width="42" height="42"/>
+        <img src="/assets/logo.png" alt="K2" width="42" height="42" onerror="this.style.display='none'"/>
       </span>
       <span class="brandtext">
         <span class="name">CamperBox</span>
@@ -45,7 +46,7 @@
       <a href="#faq" data-i18n="nav_faq">FAQ</a>
       <a href="/configurator.html" data-i18n="nav_cfg">Konfigurator</a>
       <a href="/cabinet.html" data-i18n="nav_cab">Cabinet</a>
-      <a href="#contact" class="btn small ghost" data-i18n="nav_contact">Kontakt</a>
+      <a href="#contact" class="btn small neutral" data-i18n="nav_contact">Kontakt</a>
     </nav>
 
     <div class="lang">
@@ -57,7 +58,7 @@
 
   <main id="top" class="wrap">
     <section class="hero">
-      <div class="heroLeft">
+      <div class="heroLeft reveal">
         <div class="badge" data-i18n="hero_badge">🇩🇪 Kassel • Deutschland • Lieferung/Einbau</div>
 
         <h1 data-i18n="hero_title">K2 CamperBox — dein Auto in 5 Minuten zum Camper</h1>
@@ -68,36 +69,40 @@
         </p>
 
         <div class="ctaRow">
-          <button class="btn primary tg" id="btnRequest" data-i18n="cta_request">
+          <button class="btn primary telegram" id="btnRequest" data-i18n="cta_request">
             <span class="ico" aria-hidden="true">
               <!-- Telegram -->
               <svg viewBox="0 0 24 24" fill="none">
-                <path d="M21.8 4.3 3.8 11.5c-1.1.4-1.1 2 .1 2.3l4.5 1.2 1.7 5.2c.4 1.1 1.9 1.4 2.7.5l2.5-2.6 4.6 3.4c.9.7 2.2.2 2.5-.9l3.1-14.7c.3-1.4-1.1-2.4-2.7-1.6Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
-                <path d="M9.1 14.9 19.7 7.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                <path d="M21.8 4.6c.2-1-.7-1.7-1.6-1.3L2.9 10.3c-1 .4-.9 1.8.1 2.1l4.7 1.5 1.8 5.6c.3 1 1.6 1 2-.1l2.6-4.8 5.1 3.7c.9.7 2.2.2 2.4-.9L21.8 4.6Z" stroke="currentColor" stroke-width="1.7" />
+                <path d="M8.1 13.9 19.9 6.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
               </svg>
             </span>
-            <span class="btnText">Anfrage in Telegram</span>
+            <span class="txt">Anfrage in Telegram</span>
           </button>
 
-          <button class="btn rev" id="btnPay" data-i18n="cta_pay">
+          <button class="btn pay revolut" id="btnPay" data-i18n="cta_pay">
             <span class="ico" aria-hidden="true">
-              <!-- QR / Payment -->
+              <!-- Card/QR -->
               <svg viewBox="0 0 24 24" fill="none">
-                <path d="M4 4h6v6H4V4Zm10 0h6v6h-6V4ZM4 14h6v6H4v-6Zm10 10v-4h4v4h-4Zm4-10h2v2h-2v-2Zm-4 0h2v2h-2v-2Zm0 4h6v2h-6v-2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+                <path d="M4.5 7.5h15c1.1 0 2 .9 2 2v7c0 1.1-.9 2-2 2h-15c-1.1 0-2-.9-2-2v-7c0-1.1.9-2 2-2Z" stroke="currentColor" stroke-width="1.7"/>
+                <path d="M2.6 10.2h18.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                <path d="M6.4 14.1h4.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                <path d="M14 14h3.2v3.2H14V14Z" stroke="currentColor" stroke-width="1.7"/>
               </svg>
             </span>
-            <span class="btnText">Revolut QR bezahlen</span>
+            <span class="txt">Revolut QR bezahlen</span>
           </button>
 
-          <button class="btn install" id="btnInstall" data-i18n="cta_install">
+          <button class="btn install ghost" id="btnInstall" data-i18n="cta_install">
             <span class="ico" aria-hidden="true">
-              <!-- Install -->
+              <!-- Download -->
               <svg viewBox="0 0 24 24" fill="none">
-                <path d="M12 3v10m0 0 4-4m-4 4-4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                <path d="M12 3v10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                <path d="M8.5 10.8 12 13.9l3.5-3.1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M5 16.5v2c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2v-2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
               </svg>
             </span>
-            <span class="btnText">App installieren</span>
+            <span class="txt">App installieren</span>
           </button>
         </div>
 
@@ -118,49 +123,53 @@
       </div>
 
       <div class="heroRight">
-        <div class="card heroCard live">
+        <div class="card heroCard live reveal">
           <div class="cardTop">
             <div class="cardTitle" data-i18n="hero_card_title">Sofort-Angebot</div>
             <div class="pill" data-i18n="hero_card_pill">Heute antworten</div>
           </div>
+
           <div class="cardBody">
             <div class="row">
               <div class="label" data-i18n="hero_card_model">Auto/Modell</div>
               <input id="carModel" class="input" placeholder="z.B. VW Caddy Maxi" />
             </div>
+
             <div class="row">
               <div class="label" data-i18n="hero_card_wishes">Wünsche</div>
               <textarea id="wishes" class="input area" placeholder="Bett, Küche, Stauraum, Budget…"></textarea>
             </div>
+
             <div class="row2">
-              <button class="btn primary tg full" id="btnSend" data-i18n="hero_card_send">
+              <button class="btn primary full telegram" id="btnSend" data-i18n="hero_card_send">
                 <span class="ico" aria-hidden="true">
                   <svg viewBox="0 0 24 24" fill="none">
-                    <path d="M21.8 4.3 3.8 11.5c-1.1.4-1.1 2 .1 2.3l4.5 1.2 1.7 5.2c.4 1.1 1.9 1.4 2.7.5l2.5-2.6 4.6 3.4c.9.7 2.2.2 2.5-.9l3.1-14.7c.3-1.4-1.1-2.4-2.7-1.6Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
-                    <path d="M9.1 14.9 19.7 7.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                    <path d="M21.8 4.6c.2-1-.7-1.7-1.6-1.3L2.9 10.3c-1 .4-.9 1.8.1 2.1l4.7 1.5 1.8 5.6c.3 1 1.6 1 2-.1l2.6-4.8 5.1 3.7c.9.7 2.2.2 2.4-.9L21.8 4.6Z" stroke="currentColor" stroke-width="1.7" />
+                    <path d="M8.1 13.9 19.9 6.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
                   </svg>
                 </span>
-                <span class="btnText">In Telegram senden</span>
+                <span class="txt">In Telegram senden</span>
               </button>
 
-              <button class="btn full ghost" id="btnCopy" data-i18n="hero_card_copy">
+              <button class="btn full neutral" id="btnCopy" data-i18n="hero_card_copy">
                 <span class="ico" aria-hidden="true">
                   <!-- Copy -->
                   <svg viewBox="0 0 24 24" fill="none">
-                    <path d="M9 9h10v12H9V9Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
-                    <path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                    <path d="M9 9h10v10H9V9Z" stroke="currentColor" stroke-width="1.7"/>
+                    <path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
                   </svg>
                 </span>
-                <span class="btnText">Text kopieren</span>
+                <span class="txt">Text kopieren</span>
               </button>
             </div>
+
             <div class="hint" data-i18n="hero_card_hint">
               Tipp: Wenn Telegram nicht öffnet — kopiere den Text und sende ihn an @k2camperbox.
             </div>
           </div>
         </div>
 
-        <div class="card stats live">
+        <div class="card stats live reveal">
           <div class="stat">
             <div class="statNum">DE/UA/RU</div>
             <div class="statLab" data-i18n="stat_1">3 Sprachen</div>
@@ -177,7 +186,7 @@
       </div>
     </section>
 
-    <section id="models" class="section">
+    <section id="models" class="section reveal">
       <div class="sectionHead">
         <h2 data-i18n="models_title">Für welche Autos?</h2>
         <p class="muted" data-i18n="models_sub">Hochdachkombis & kompakte Vans — wir passen das Modul an.</p>
@@ -202,7 +211,7 @@
       </div>
     </section>
 
-    <section id="packages" class="section">
+    <section id="packages" class="section reveal">
       <div class="sectionHead">
         <h2 data-i18n="packages_title">Pakete</h2>
         <p class="muted" data-i18n="packages_sub">Beispiele. Endpreis hängt vom Auto und den Optionen ab.</p>
@@ -219,15 +228,7 @@
             <li data-i18n="pkg_1_b">Schneller Ein-/Ausbau</li>
             <li data-i18n="pkg_1_c">Leicht & stabil</li>
           </ul>
-          <button class="btn full tg" data-pkg="Start" data-i18n="pkg_btn">
-            <span class="ico" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none">
-                <path d="M21.8 4.3 3.8 11.5c-1.1.4-1.1 2 .1 2.3l4.5 1.2 1.7 5.2c.4 1.1 1.9 1.4 2.7.5l2.5-2.6 4.6 3.4c.9.7 2.2.2 2.5-.9l3.1-14.7c.3-1.4-1.1-2.4-2.7-1.6Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
-                <path d="M9.1 14.9 19.7 7.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-              </svg>
-            </span>
-            <span class="btnText">Anfragen</span>
-          </button>
+          <button class="btn full neutral" data-pkg="Start" data-i18n="pkg_btn">Anfragen</button>
         </div>
 
         <div class="priceCard featured live">
@@ -240,15 +241,7 @@
             <li data-i18n="pkg_2_b">Matratze / Polster-Set</li>
             <li data-i18n="pkg_2_c">Option: Auszug-Tisch</li>
           </ul>
-          <button class="btn primary full tg" data-pkg="Comfort" data-i18n="pkg_btn">
-            <span class="ico" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none">
-                <path d="M21.8 4.3 3.8 11.5c-1.1.4-1.1 2 .1 2.3l4.5 1.2 1.7 5.2c.4 1.1 1.9 1.4 2.7.5l2.5-2.6 4.6 3.4c.9.7 2.2.2 2.5-.9l3.1-14.7c.3-1.4-1.1-2.4-2.7-1.6Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
-                <path d="M9.1 14.9 19.7 7.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-              </svg>
-            </span>
-            <span class="btnText">Anfragen</span>
-          </button>
+          <button class="btn primary full telegram" data-pkg="Comfort" data-i18n="pkg_btn">Anfragen</button>
         </div>
 
         <div class="priceCard live">
@@ -261,20 +254,12 @@
             <li data-i18n="pkg_3_b">12V / Power-Optionen</li>
             <li data-i18n="pkg_3_c">Individuelle Anpassung</li>
           </ul>
-          <button class="btn full tg" data-pkg="Pro" data-i18n="pkg_btn">
-            <span class="ico" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none">
-                <path d="M21.8 4.3 3.8 11.5c-1.1.4-1.1 2 .1 2.3l4.5 1.2 1.7 5.2c.4 1.1 1.9 1.4 2.7.5l2.5-2.6 4.6 3.4c.9.7 2.2.2 2.5-.9l3.1-14.7c.3-1.4-1.1-2.4-2.7-1.6Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
-                <path d="M9.1 14.9 19.7 7.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-              </svg>
-            </span>
-            <span class="btnText">Anfragen</span>
-          </button>
+          <button class="btn full neutral" data-pkg="Pro" data-i18n="pkg_btn">Anfragen</button>
         </div>
       </div>
     </section>
 
-    <section id="gallery" class="section">
+    <section id="gallery" class="section reveal">
       <div class="sectionHead">
         <h2 data-i18n="gallery_title">Galerie (Platzhalter)</h2>
         <p class="muted" data-i18n="gallery_sub">Заміни ці картинки на свої фото (див. інструкцію нижче).</p>
@@ -286,19 +271,20 @@
         <div class="shot s3 live"></div>
         <div class="shot s4 live"></div>
       </div>
+
       <div class="note" data-i18n="gallery_note">
         Файли фото: /assets/gallery-1.jpg … /assets/gallery-4.jpg (можеш загрузити свої).
       </div>
     </section>
 
-    <section id="faq" class="section">
+    <section id="faq" class="section reveal">
       <div class="sectionHead">
         <h2 data-i18n="faq_title">FAQ</h2>
         <p class="muted" data-i18n="faq_sub">Kurz & ehrlich — для чайника.</p>
       </div>
 
       <div class="faq">
-        <details class="live" open>
+        <details open class="live">
           <summary data-i18n="faq_q1">Wie schnell kann ich bestellen?</summary>
           <div class="faqA" data-i18n="faq_a1">Schreib in Telegram, wir klären Auto + Optionen. Danach bekommst du Preis & срок.</div>
         </details>
@@ -313,7 +299,7 @@
       </div>
     </section>
 
-    <section id="request" class="section">
+    <section id="request" class="section reveal">
       <div class="sectionHead">
         <h2 data-i18n="form_title">Anfrage-Formular</h2>
         <p class="muted" data-i18n="form_sub">Отправка заявки в Google Sheets (через Apps Script).</p>
@@ -346,26 +332,38 @@
           </div>
 
           <div class="ctaRow" style="margin-top:10px">
-            <button class="btn primary full" type="submit" id="btnSubmitLead" data-i18n="f_send">
+            <button class="btn primary telegram" type="submit" id="btnSubmitLead" data-i18n="f_send">
               <span class="ico" aria-hidden="true">
-                <!-- Send -->
                 <svg viewBox="0 0 24 24" fill="none">
-                  <path d="M21 12 3 3l3 9 12 0-12 0 0 0-12 0 12 0-12 0 0 0 0 0-12 0 12 0-12 0 0 0 12 0-12 0 0 0L3 21l18-9Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+                  <path d="M21.8 4.6c.2-1-.7-1.7-1.6-1.3L2.9 10.3c-1 .4-.9 1.8.1 2.1l4.7 1.5 1.8 5.6c.3 1 1.6 1 2-.1l2.6-4.8 5.1 3.7c.9.7 2.2.2 2.4-.9L21.8 4.6Z" stroke="currentColor" stroke-width="1.7" />
+                  <path d="M8.1 13.9 19.9 6.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
                 </svg>
               </span>
-              <span class="btnText">In Sheets senden</span>
+              <span class="txt">In Sheets senden</span>
             </button>
 
-            <a class="btn full ghost" href="/crm.html" data-i18n="f_open_crm">Mini-CRM öffnen</a>
-
-            <button class="btn full tg" type="button" id="btnSendTg2" data-i18n="f_send_tg">
+            <a class="btn neutral" href="/crm.html" data-i18n="f_open_crm">
               <span class="ico" aria-hidden="true">
+                <!-- Grid -->
                 <svg viewBox="0 0 24 24" fill="none">
-                  <path d="M21.8 4.3 3.8 11.5c-1.1.4-1.1 2 .1 2.3l4.5 1.2 1.7 5.2c.4 1.1 1.9 1.4 2.7.5l2.5-2.6 4.6 3.4c.9.7 2.2.2 2.5-.9l3.1-14.7c.3-1.4-1.1-2.4-2.7-1.6Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
-                  <path d="M9.1 14.9 19.7 7.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                  <path d="M4 4h7v7H4V4Z" stroke="currentColor" stroke-width="1.7"/>
+                  <path d="M13 4h7v7h-7V4Z" stroke="currentColor" stroke-width="1.7"/>
+                  <path d="M4 13h7v7H4v-7Z" stroke="currentColor" stroke-width="1.7"/>
+                  <path d="M13 13h7v7h-7v-7Z" stroke="currentColor" stroke-width="1.7"/>
                 </svg>
               </span>
-              <span class="btnText">Oder in Telegram senden</span>
+              <span class="txt">Mini-CRM öffnen</span>
+            </a>
+
+            <button class="btn ghost install" type="button" id="btnSendTg2" data-i18n="f_send_tg">
+              <span class="ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M12 3v10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                  <path d="M8.5 10.8 12 13.9l3.5-3.1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M5 16.5v2c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2v-2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                </svg>
+              </span>
+              <span class="txt">Oder in Telegram senden</span>
             </button>
           </div>
 
@@ -376,7 +374,7 @@
       </div>
     </section>
 
-    <section id="contact" class="section">
+    <section id="contact" class="section reveal">
       <div class="sectionHead">
         <h2 data-i18n="contact_title">Kontakt</h2>
         <p class="muted" data-i18n="contact_sub">Alles кликабельно: Telegram • Telefon • Email • Zahlung.</p>
@@ -428,25 +426,30 @@
     </section>
 
     <div class="mobileBar">
-      <a class="btn primary tg" href="#request" data-i18n="mob_request">
+      <a class="btn primary telegram" href="#request" data-i18n="mob_request">
         <span class="ico" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none">
-            <path d="M21.8 4.3 3.8 11.5c-1.1.4-1.1 2 .1 2.3l4.5 1.2 1.7 5.2c.4 1.1 1.9 1.4 2.7.5l2.5-2.6 4.6 3.4c.9.7 2.2.2 2.5-.9l3.1-14.7c.3-1.4-1.1-2.4-2.7-1.6Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
-            <path d="M9.1 14.9 19.7 7.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M21.8 4.6c.2-1-.7-1.7-1.6-1.3L2.9 10.3c-1 .4-.9 1.8.1 2.1l4.7 1.5 1.8 5.6c.3 1 1.6 1 2-.1l2.6-4.8 5.1 3.7c.9.7 2.2.2 2.4-.9L21.8 4.6Z" stroke="currentColor" stroke-width="1.7" />
+            <path d="M8.1 13.9 19.9 6.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
           </svg>
         </span>
-        <span class="btnText">Заявка</span>
+        <span class="txt">Заявка</span>
       </a>
-      <button class="btn rev" id="mobPay" data-i18n="mob_pay">
+
+      <button class="btn pay revolut" id="mobPay" data-i18n="mob_pay">
         <span class="ico" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none">
-            <path d="M4 4h6v6H4V4Zm10 0h6v6h-6V4ZM4 14h6v6H4v-6Zm10 10v-4h4v4h-4Zm4-10h2v2h-2v-2Zm-4 0h2v2h-2v-2Zm0 4h6v2h-6v-2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+            <path d="M4.5 7.5h15c1.1 0 2 .9 2 2v7c0 1.1-.9 2-2 2h-15c-1.1 0-2-.9-2-2v-7c0-1.1.9-2 2-2Z" stroke="currentColor" stroke-width="1.7"/>
+            <path d="M2.6 10.2h18.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+            <path d="M6.4 14.1h4.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+            <path d="M14 14h3.2v3.2H14V14Z" stroke="currentColor" stroke-width="1.7"/>
           </svg>
         </span>
-        <span class="btnText">QR</span>
+        <span class="txt">QR</span>
       </button>
-      <a class="btn ghost" href="/configurator.html" data-i18n="mob_cfg">LEGO</a>
-      <a class="btn ghost" href="/cabinet.html" data-i18n="mob_cab">Кабинет</a>
+
+      <a class="btn neutral" href="/configurator.html" data-i18n="mob_cfg">LEGO</a>
+      <a class="btn neutral" href="/cabinet.html" data-i18n="mob_cab">Cabinet</a>
     </div>
   </main>
 
@@ -461,7 +464,7 @@
 
       <div class="modalBody">
         <div class="qrWrap">
-          <img src="/assets/revolut-qr.png" alt="Revolut QR" class="qr" />
+          <img src="/assets/revolut-qr.png" alt="Revolut QR" class="qr" onerror="this.alt='(QR not found)';" />
           <div class="qrHint" data-i18n="pay_hint">Открой Revolut → Scan → наведи на QR → оплати.</div>
         </div>
 
@@ -474,8 +477,8 @@
         </div>
 
         <div class="modalActions">
-          <a class="btn full ghost" href="/assets/revolut-qr.png" download data-i18n="pay_download">Скачать QR</a>
-          <button class="btn primary full rev" data-close data-i18n="pay_close">Закрыть</button>
+          <a class="btn full neutral" href="/assets/revolut-qr.png" download data-i18n="pay_download">Скачать QR</a>
+          <button class="btn primary telegram full" data-close data-i18n="pay_close">Закрыть</button>
         </div>
       </div>
     </div>
