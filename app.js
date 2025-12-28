@@ -1,6 +1,6 @@
 /* K2 CamperBox — single-file app logic (no build tools)
    - Language switch: DE / UA / RU
-   - Telegram request: opens chat with prefilled message + copy to clipboard
+   - Telegram request: opens chat + copies message
    - PWA install button
    - Revolut QR modal
 */
@@ -55,70 +55,11 @@
       toast_copied:"Kopiert ✅",
       form_title:"Anfrage-Formular",
       form_sub:"Sende Anfrage direkt in Google Sheets (Apps Script).",
-      f_name:"Name",
-      f_phone:"Telefon",
-      f_email:"Email",
-      f_car:"Auto/Modell",
-      f_msg:"Nachricht",
-      f_send:"In Sheets senden",
-      f_open_crm:"Mini-CRM öffnen",
-      f_send_tg:"Oder in Telegram senden",
+      f_name:"Name", f_phone:"Telefon", f_email:"Email", f_car:"Auto/Modell", f_msg:"Nachricht",
+      f_send:"In Sheets senden", f_open_crm:"Mini-CRM öffnen", f_send_tg:"Oder in Telegram senden",
       f_hint:"Damit das Formular funktioniert: Apps Script URL in crm-config.js eintragen. Sonst nutze Telegram.",
-      crm_title:"Mini-CRM",
-      crm_sub:"Letzte Anfragen aus Google Sheets (ohne Login).",
-      crm_open:"CRM öffnen",
-      crm_open_leads:"Leads öffnen",
-      crm_open_new:"NEW öffnen",
-      crm_reload:"Aktualisieren",
-      crm_status:"Status:",
-      crm_hint:"Tipp: “+1 Status” ändert NEW→IN_WORK→DONE direkt aus der Tabelle.",
-      t_created:"Datum",
-      t_name:"Name",
-      t_phone:"Telefon",
-      t_car:"Auto",
-      t_msg:"Nachricht",
-      t_status:"Status",
-      crm_setup:"Damit es funktioniert: Apps Script URL in crm-config.js einfügen und Web App deployen.",
-      nav_cfg:"Konfigurator",
-      nav_cab:"Cabinet",
-      mob_request:"Anfrage",
-      mob_pay:"QR",
-      mob_cfg:"LEGO",
-      mob_cab:"Cabinet",
-      cab_tag:"Cabinet",
-      cab_home:"Home",
-      cab_cfg:"Konfigurator",
-      cab_crm:"CRM",
-      cab_title:"Cabinet",
-      cab_sub:"Schnellbuttons + Mini-Tabelle (wie UHU.digital).",
-      cab_t1:"Anfrage erstellen",
-      cab_t1s:"Form → Google Sheets",
-      cab_t2:"Telegram",
-      cab_t3:"Konfigurator",
-      cab_t3s:"Baue wie LEGO",
-      cab_open_crm:"CRM öffnen",
-      cab_open_leads:"Leads öffnen",
-      cab_open_new:"NEW öffnen",
-      cab_open_crm_page:"CRM-Seite",
-      cab_status:"Status:",
-      cab_reload:"Aktualisieren",
-      cab_hint:"Mini-Tabelle der letzten 10 Leads. “+1” wechselt NEW→IN_WORK→DONE.",
-      cfg_tag:"LEGO Konfigurator",
-      cfg_cab:"Cabinet",
-      cfg_crm:"CRM",
-      cfg_form:"Form",
-      cfg_title:"Konfigurator (wie LEGO)",
-      cfg_sub:"Wähle Fahrzeug + Module. Sende Anfrage.",
-      cfg_vehicle:"Fahrzeug",
-      cfg_notes:"Notizen",
-      cfg_modules:"Module (klicken zum Hinzufügen)",
-      cfg_your:"Dein Build",
-      cfg_sum:"Module gesamt:",
-      cfg_est:"Schätzung:",
-      cfg_est_note:"Nur Platzhalter. Preis nach Klärung.",
-      cfg_send_tg:"In Telegram senden",
-      cfg_copy:"Kopieren",
-      cfg_hint:"Das ist das Grundgerüst. Später 3D/Drag&Drop möglich."
+      nav_cfg:"Konfigurator", nav_cab:"Cabinet",
+      mob_request:"Anfrage", mob_pay:"QR", mob_cfg:"LEGO", mob_cab:"Cabinet",
     },
     ua: {
       nav_models:"Авто", nav_packages:"Пакети", nav_gallery:"Галерея", nav_faq:"FAQ", nav_contact:"Контакти",
@@ -158,70 +99,11 @@
       toast_copied:"Скопійовано ✅",
       form_title:"Форма заявки",
       form_sub:"Надсилає заявку в Google Sheets (через Apps Script).",
-      f_name:"Імʼя",
-      f_phone:"Телефон",
-      f_email:"Email",
-      f_car:"Авто/модель",
-      f_msg:"Повідомлення",
-      f_send:"Надіслати в Sheets",
-      f_open_crm:"Відкрити Mini-CRM",
-      f_send_tg:"Або надіслати в Telegram",
+      f_name:"Імʼя", f_phone:"Телефон", f_email:"Email", f_car:"Авто/модель", f_msg:"Повідомлення",
+      f_send:"Надіслати в Sheets", f_open_crm:"Відкрити Mini-CRM", f_send_tg:"Або надіслати в Telegram",
       f_hint:"Щоб форма працювала: встав Apps Script URL у crm-config.js. Якщо не налаштовано — використовуй Telegram.",
-      crm_title:"Mini-CRM",
-      crm_sub:"Останні заявки з Google Sheets (без авторизації).",
-      crm_open:"Відкрити CRM",
-      crm_open_leads:"Відкрити Leads",
-      crm_open_new:"Відкрити NEW",
-      crm_reload:"Оновити",
-      crm_status:"Статус:",
-      crm_hint:"Порада: “+1 статус” змінює NEW→IN_WORK→DONE прямо з таблиці.",
-      t_created:"Дата",
-      t_name:"Імʼя",
-      t_phone:"Телефон",
-      t_car:"Авто",
-      t_msg:"Повідомлення",
-      t_status:"Статус",
-      crm_setup:"Щоб запрацювало: встав Apps Script URL у crm-config.js та задеплой Web App.",
-      nav_cfg:"Конфігуратор",
-      nav_cab:"Кабінет",
-      mob_request:"Заявка",
-      mob_pay:"QR",
-      mob_cfg:"LEGO",
-      mob_cab:"Кабінет",
-      cab_tag:"Кабінет",
-      cab_home:"Home",
-      cab_cfg:"Конфігуратор",
-      cab_crm:"CRM",
-      cab_title:"Кабінет",
-      cab_sub:"Швидкі кнопки + міні-таблиця (як UHU.digital).",
-      cab_t1:"Створити заявку",
-      cab_t1s:"Форма → Google Sheets",
-      cab_t2:"Telegram",
-      cab_t3:"Конфігуратор",
-      cab_t3s:"Збери як LEGO",
-      cab_open_crm:"Відкрити CRM",
-      cab_open_leads:"Відкрити Leads",
-      cab_open_new:"Відкрити NEW",
-      cab_open_crm_page:"Сторінка CRM",
-      cab_status:"Статус:",
-      cab_reload:"Оновити",
-      cab_hint:"Міні-таблиця 10 заявок. “+1” змінює NEW→IN_WORK→DONE.",
-      cfg_tag:"LEGO Конфігуратор",
-      cfg_cab:"Кабінет",
-      cfg_crm:"CRM",
-      cfg_form:"Форма",
-      cfg_title:"Конфігуратор (як LEGO)",
-      cfg_sub:"Обери авто + модулі. Надішли заявку.",
-      cfg_vehicle:"Авто",
-      cfg_notes:"Побажання",
-      cfg_modules:"Модулі (натисни щоб додати)",
-      cfg_your:"Твоя збірка",
-      cfg_sum:"Всього модулів:",
-      cfg_est:"Оцінка:",
-      cfg_est_note:"Лише плейсхолдер. Ціна після уточнення.",
-      cfg_send_tg:"Надіслати в Telegram",
-      cfg_copy:"Скопіювати",
-      cfg_hint:"Це каркас. Далі можна 3D/drag&drop."
+      nav_cfg:"Конфігуратор", nav_cab:"Кабінет",
+      mob_request:"Заявка", mob_pay:"QR", mob_cfg:"LEGO", mob_cab:"Кабінет",
     },
     ru: {
       nav_models:"Авто", nav_packages:"Пакеты", nav_gallery:"Галерея", nav_faq:"FAQ", nav_contact:"Контакты",
@@ -258,16 +140,23 @@
       pay_title:"Оплата Revolut QR", pay_hint:"Открой Revolut → Scan → наведи на QR → оплати.",
       pay_to:"Получатель:", pay_note:"Комментарий:", pay_replace:"Важно: это демо QR. Замени /assets/revolut-qr.png на свой реальный QR из Revolut.",
       pay_download:"Скачать QR", pay_close:"Закрыть",
-      toast_copied:"Скопировано ✅"
+      toast_copied:"Скопировано ✅",
+      form_title:"Форма заявки",
+      form_sub:"Отправка заявки в Google Sheets (через Apps Script).",
+      f_name:"Имя", f_phone:"Телефон", f_email:"Email", f_car:"Авто/модель", f_msg:"Сообщение",
+      f_send:"Отправить в Sheets", f_open_crm:"Открыть Mini-CRM", f_send_tg:"Или отправить в Telegram",
+      f_hint:"Чтобы форма работала: вставь Apps Script URL в crm-config.js. Если не настроено — используй Telegram.",
+      nav_cfg:"Конфигуратор", nav_cab:"Кабинет",
+      mob_request:"Заявка", mob_pay:"QR", mob_cfg:"LEGO", mob_cab:"Кабинет",
     }
   };
 
   const toast = (msg) => {
-    let t = $("#toast");
+    let t = document.getElementById("toast");
     if(!t){
       t = document.createElement("div");
       t.id = "toast";
-      t.style.cssText = "position:fixed;left:50%;bottom:22px;transform:translateX(-50%);padding:10px 12px;border-radius:12px;border:1px solid rgba(36,48,95,.8);background:rgba(11,18,48,.92);backdrop-filter: blur(10px);font-weight:800;z-index:120;opacity:0;transition:opacity .15s ease";
+      t.style.cssText = "position:fixed;left:50%;bottom:22px;transform:translateX(-50%);padding:10px 12px;border-radius:14px;border:1px solid rgba(150,170,255,.18);background:rgba(6,10,22,.78);backdrop-filter: blur(14px);font-weight:900;z-index:120;opacity:0;transition:opacity .15s ease;box-shadow:0 18px 60px rgba(0,0,0,.45);";
       document.body.appendChild(t);
     }
     t.textContent = msg;
@@ -276,9 +165,11 @@
     toast._tm = setTimeout(()=> t.style.opacity="0", 1400);
   };
 
+  const getLang = () => (localStorage.getItem("k2_lang") || "de");
+
   const buildMessage = (pkg) => {
-    const model = ($("#carModel")?.value || "").trim();
-    const wishes = ($("#wishes")?.value || "").trim();
+    const model = (document.getElementById("carModel")?.value || "").trim();
+    const wishes = (document.getElementById("wishes")?.value || "").trim();
     const lines = [
       `👋 ${cfg.projectName} Anfrage`,
       pkg ? `📦 Paket: ${pkg}` : null,
@@ -292,38 +183,41 @@
     return lines.join("\n");
   };
 
-  const openTelegram = (text) => {
-    // For best compatibility: open username and keep message in clipboard too
-    navigator.clipboard?.writeText(text).catch(()=>{});
+  const openTelegram = async (text) => {
+    try{ await navigator.clipboard?.writeText(text); }catch(e){}
     window.open(cfg.telegram, "_blank", "noopener");
   };
 
   const setLang = (lang) => {
     document.documentElement.lang = lang === "ua" ? "uk" : lang;
+
     $$(".chip").forEach(b => {
       const on = b.dataset.lang === lang;
       b.classList.toggle("active", on);
       b.setAttribute("aria-pressed", on ? "true" : "false");
     });
+
     $$("[data-i18n]").forEach(el => {
       const key = el.getAttribute("data-i18n");
       const v = i18n[lang]?.[key];
       if (typeof v === "string") el.textContent = v;
     });
+
     localStorage.setItem("k2_lang", lang);
   };
 
   // Modal
-  const modal = $("#payModal");
-  const openPay = () => { modal.classList.add("show"); modal.setAttribute("aria-hidden","false"); };
-  const closePay = () => { modal.classList.remove("show"); modal.setAttribute("aria-hidden","true"); };
+  const modal = document.getElementById("payModal");
+  const openPay = () => { if(!modal) return; modal.classList.add("show"); modal.setAttribute("aria-hidden","false"); };
+  const closePay = () => { if(!modal) return; modal.classList.remove("show"); modal.setAttribute("aria-hidden","true"); };
 
   // PWA install
   let deferredPrompt = null;
   window.addEventListener("beforeinstallprompt", (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    $("#btnInstall")?.classList.remove("ghost");
+    const b = document.getElementById("btnInstall");
+    if(b){ b.classList.remove("ghost"); b.classList.add("install"); }
   });
 
   const installApp = async () => {
@@ -334,18 +228,17 @@
   };
 
   // Init
-  const saved = localStorage.getItem("k2_lang") || "de";
-  setLang(saved);
-
-  // Footer year
-  $("#y").textContent = String(new Date().getFullYear());
+  setLang(getLang());
+  const y = document.getElementById("y");
+  if(y) y.textContent = String(new Date().getFullYear());
 
   // Events
-  $("#btnRequest")?.addEventListener("click", () => openTelegram(buildMessage(null)));
-  $("#btnSend")?.addEventListener("click", () => openTelegram(buildMessage(null)));
-  $("#btnCopy")?.addEventListener("click", async () => {
+  document.getElementById("btnRequest")?.addEventListener("click", () => openTelegram(buildMessage(null)));
+  document.getElementById("btnSend")?.addEventListener("click", () => openTelegram(buildMessage(null)));
+
+  document.getElementById("btnCopy")?.addEventListener("click", async () => {
     const text = buildMessage(null);
-    try { await navigator.clipboard.writeText(text); toast(i18n[localStorage.getItem("k2_lang")||"de"].toast_copied); }
+    try { await navigator.clipboard.writeText(text); toast(i18n[getLang()].toast_copied || "Copied ✅"); }
     catch { toast("Copy failed"); }
   });
 
@@ -356,25 +249,29 @@
     });
   });
 
-  $("#btnPay")?.addEventListener("click", openPay);
-  $("#btnPay2")?.addEventListener("click", openPay);
-  $("#mobPay")?.addEventListener("click", openPay);
+  document.getElementById("btnPay")?.addEventListener("click", openPay);
+  document.getElementById("btnPay2")?.addEventListener("click", openPay);
+  document.getElementById("mobPay")?.addEventListener("click", openPay);
+
   modal?.addEventListener("click", (e) => {
     const t = e.target;
     if (t && (t.matches("[data-close]") || t.closest("[data-close]"))) closePay();
   });
-  document.addEventListener("keydown", (e) => { if(e.key==="Escape" && modal.classList.contains("show")) closePay(); });
 
-  $("#btnInstall")?.addEventListener("click", installApp);
+  document.addEventListener("keydown", (e) => {
+    if(e.key==="Escape" && modal?.classList.contains("show")) closePay();
+  });
 
+  document.getElementById("btnInstall")?.addEventListener("click", installApp);
   $$(".chip").forEach(b => b.addEventListener("click", () => setLang(b.dataset.lang)));
 
   // Service Worker
   if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => navigator.serviceWorker.register("/sw.js").catch(()=>{}));
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("/sw.js").catch(()=>{});
+    });
   }
 })();
-
 
 
 /* Lead form -> Apps Script (submitLead) */
@@ -390,7 +287,7 @@
     if(!t){
       t = document.createElement("div");
       t.id = "toast";
-      t.style.cssText = "position:fixed;left:50%;bottom:22px;transform:translateX(-50%);padding:10px 12px;border-radius:12px;border:1px solid rgba(36,48,95,.8);background:rgba(11,18,48,.92);backdrop-filter: blur(10px);font-weight:800;z-index:120;opacity:0;transition:opacity .15s ease";
+      t.style.cssText = "position:fixed;left:50%;bottom:22px;transform:translateX(-50%);padding:10px 12px;border-radius:14px;border:1px solid rgba(150,170,255,.18);background:rgba(6,10,22,.78);backdrop-filter: blur(14px);font-weight:900;z-index:120;opacity:0;transition:opacity .15s ease;box-shadow:0 18px 60px rgba(0,0,0,.45);";
       document.body.appendChild(t);
     }
     t.textContent = msg;
@@ -416,11 +313,11 @@
   };
 
   if(sendTg){
-    sendTg.addEventListener("click", () => {
+    sendTg.addEventListener("click", async () => {
       try{
-        navigator.clipboard?.writeText(buildMsgFromForm()).catch(()=>{});
-        window.open("https://t.me/k2camperbox","_blank","noopener");
+        await navigator.clipboard?.writeText(buildMsgFromForm());
       }catch(e){}
+      window.open("https://t.me/k2camperbox","_blank","noopener");
     });
   }
 
@@ -432,14 +329,16 @@
       toast("Форма не настроена (SCRIPT_URL). Используй Telegram.");
       return;
     }
+
     const fd = new FormData(form);
     fd.set("lang", lang());
     fd.set("source", location.href);
 
-    btn && (btn.disabled = true);
+    if(btn) btn.disabled = true;
+
     try{
       const res = await fetch(scriptUrl + "?action=submitLead", { method:"POST", body: fd });
-      const json = await res.json();
+      const json = await res.json().catch(()=>null);
       if(json && json.ok){
         toast("Заявка отправлена ✅");
         form.reset();
@@ -449,7 +348,7 @@
     }catch(err){
       toast("Ошибка сети/скрипта");
     } finally {
-      btn && (btn.disabled = false);
+      if(btn) btn.disabled = false;
     }
   });
 })();
