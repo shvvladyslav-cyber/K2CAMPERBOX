@@ -1,31 +1,271 @@
-/* app.js — K2 CamperBox (premium + bugfix)
-   ✅ Language switch: DE / UA / RU
-   ✅ Telegram request: opens share with prefilled message + copy fallback
-   ✅ PWA install button: hides when installed / in standalone
-   ✅ Revolut QR modal
-   ✅ Micro-UX: icons inside buttons + lightweight ripple
-   ✅ Safe SW register (relative)
+/* app.js — K2 CamperBox premium landing logic (no build tools)
+   Features:
+   - i18n DE/UA/RU
+   - Premium buttons: icons + ripple + shine (lightweight)
+   - Cards micro animations (subtle)
+   - Local offline gallery with lightbox (assets/gallery-1..6.jpg)
+   - PWA install button hides when installed + appinstalled handling
+   - Revolut QR modal
+   - Telegram request (copy + open)
+   - Lead form submit to Apps Script
 */
 (() => {
-  'use strict';
+  "use strict";
 
-  const $  = (s, root = document) => root.querySelector(s);
+  // =========================
+  // Helpers
+  // =========================
+  const $ = (s, root = document) => root.querySelector(s);
   const $$ = (s, root = document) => [...root.querySelectorAll(s)];
 
-  // ===== Config
+  const isStandalone = () => {
+    // Android/desktop PWA
+    if (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) return true;
+    // iOS PWA
+    if ("standalone" in navigator && navigator.standalone) return true;
+    return false;
+  };
+
+  const injectPremiumCSS = () => {
+    if ($("#k2PremiumCSS")) return;
+    const st = document.createElement("style");
+    st.id = "k2PremiumCSS";
+    st.textContent = `
+      /* ===== Premium micro styles (injected) ===== */
+
+      /* icons inside buttons */
+      .btn .ico{
+        width: 18px; height: 18px; flex: 0 0 18px;
+        display:inline-block; vertical-align:-3px;
+        margin-right: 10px;
+        filter: drop-shadow(0 6px 14px rgba(0,0,0,.35));
+        opacity: .95;
+      }
+      .btn.small .ico{ width: 16px; height: 16px; margin-right: 8px; }
+
+      /* ripple */
+      .btn{ position: relative; overflow: hidden; transform: translateZ(0); }
+      .btn .ripple{
+        position:absolute; border-radius:999px;
+        transform: translate(-50%,-50%) scale(0);
+        pointer-events:none;
+        opacity:.35;
+        background: radial-gradient(circle, rgba(255,255,255,.95) 0%, rgba(255,255,255,.12) 45%, rgba(255,255,255,0) 70%);
+        animation: k2Ripple .65s ease-out;
+        mix-blend-mode: overlay;
+      }
+      @keyframes k2Ripple{
+        to{ transform: translate(-50%,-50%) scale(3.2); opacity:0; }
+      }
+
+      /* shine hover */
+      .btn::after{
+        content:"";
+        position:absolute; top:-60%; left:-60%;
+        width:120%; height:120%;
+        background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.16) 45%, rgba(255,255,255,0) 70%);
+        transform: rotate(18deg) translateX(-120%);
+        transition: transform .55s ease;
+        pointer-events:none;
+      }
+      .btn:hover::after{ transform: rotate(18deg) translateX(120%); }
+
+      /* premium hover: slight lift */
+      .btn{ transition: transform .16s ease, filter .16s ease; }
+      .btn:hover{ transform: translateY(-1px); filter: brightness(1.02); }
+      .btn:active{ transform: translateY(0px); }
+
+      /* subtle cards hover */
+      .card, .priceCard, .tile, .contactCard{
+        transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, filter .18s ease;
+        will-change: transform;
+      }
+      .card:hover, .priceCard:hover, .tile:hover, .contactCard:hover{
+        transform: translateY(-2px);
+        filter: brightness(1.02);
+      }
+
+      /* lightbox */
+      .k2Lightbox{
+        position: fixed; inset: 0;
+        display:none;
+        align-items:center; justify-content:center;
+        z-index: 9999;
+      }
+      .k2Lightbox.show{ display:flex; }
+      .k2LightboxBack{
+        position:absolute; inset:0;
+        background: rgba(7,10,24,.72);
+        backdrop-filter: blur(10px);
+      }
+      .k2LightboxCard{
+        position: relative;
+        width: min(980px, 92vw);
+        max-height: 86vh;
+        border-radius: 18px;
+        overflow:hidden;
+        border: 1px solid rgba(255,255,255,.10);
+        box-shadow: 0 30px 80px rgba(0,0,0,.55);
+        background: rgba(10,15,34,.85);
+      }
+      .k2LbTop{
+        display:flex; align-items:center; justify-content:space-between;
+        padding: 10px 12px;
+        border-bottom: 1px solid rgba(255,255,255,.08);
+        background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,0));
+      }
+      .k2LbTitle{
+        font-weight: 800;
+        font-size: 14px;
+        opacity: .92;
+      }
+      .k2LbBtn{
+        border:0;
+        background: rgba(255,255,255,.08);
+        color: #fff;
+        border-radius: 12px;
+        padding: 8px 10px;
+        cursor:pointer;
+        font-weight: 800;
+        transition: transform .15s ease, background .15s ease;
+      }
+      .k2LbBtn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.12); }
+      .k2LbBody{
+        position:relative;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        background: rgba(0,0,0,.12);
+      }
+      .k2LbImg{
+        width:100%;
+        height: calc(86vh - 52px);
+        object-fit: contain;
+        display:block;
+        background: radial-gradient(800px 420px at 60% 30%, rgba(255,255,255,.08), rgba(255,255,255,0));
+      }
+      .k2LbNav{
+        position:absolute;
+        inset: 52px 0 0 0;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        pointer-events:none;
+      }
+      .k2LbArrow{
+        pointer-events:auto;
+        margin: 0 10px;
+        width: 46px; height: 46px;
+        border-radius: 14px;
+        border: 1px solid rgba(255,255,255,.10);
+        background: rgba(255,255,255,.08);
+        color: #fff;
+        font-weight: 900;
+        cursor: pointer;
+        display:flex; align-items:center; justify-content:center;
+        transition: transform .15s ease, background .15s ease;
+      }
+      .k2LbArrow:hover{ transform: translateY(-1px); background: rgba(255,255,255,.12); }
+      .k2LbHint{
+        position:absolute;
+        bottom: 10px; left: 12px; right: 12px;
+        font-size: 12px;
+        opacity: .78;
+        display:flex; justify-content:space-between; gap:10px;
+        pointer-events:none;
+      }
+
+      /* hide install when not available or installed */
+      .k2Hidden{ display:none !important; }
+    `;
+    document.head.appendChild(st);
+  };
+
+  const toast = (msg) => {
+    let t = $("#toast");
+    if (!t) {
+      t = document.createElement("div");
+      t.id = "toast";
+      t.style.cssText =
+        "position:fixed;left:50%;bottom:22px;transform:translateX(-50%);padding:10px 12px;border-radius:12px;border:1px solid rgba(36,48,95,.8);background:rgba(11,18,48,.92);backdrop-filter: blur(10px);font-weight:800;z-index:120;opacity:0;transition:opacity .15s ease";
+      document.body.appendChild(t);
+    }
+    t.textContent = msg;
+    t.style.opacity = "1";
+    clearTimeout(toast._tm);
+    toast._tm = setTimeout(() => (t.style.opacity = "0"), 1400);
+  };
+
+  // Ripple on buttons
+  const bindRipple = () => {
+    const allBtns = $$(".btn, .k2LbBtn, .k2LbArrow");
+    allBtns.forEach((btn) => {
+      if (btn.dataset.rippleBound) return;
+      btn.dataset.rippleBound = "1";
+      btn.addEventListener("click", (e) => {
+        // allow normal click behavior, just visual ripple
+        const rect = btn.getBoundingClientRect();
+        const x = (e.clientX || rect.left + rect.width / 2) - rect.left;
+        const y = (e.clientY || rect.top + rect.height / 2) - rect.top;
+        const r = document.createElement("span");
+        r.className = "ripple";
+        const size = Math.max(rect.width, rect.height) * 1.2;
+        r.style.width = r.style.height = `${size}px`;
+        r.style.left = `${x}px`;
+        r.style.top = `${y}px`;
+        btn.appendChild(r);
+        setTimeout(() => r.remove(), 700);
+      }, { passive: true });
+    });
+  };
+
+  // SVG icons
+  const ICONS = {
+    telegram: `<svg class="ico" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M21.8 4.7c.3-1.2-.8-2.1-1.9-1.7L3.7 9.1c-1.2.4-1.2 2.1.1 2.5l3.9 1.2 1.5 4.9c.3 1 1.6 1.3 2.3.5l2.3-2.5 4.6 3.4c.9.7 2.2.2 2.4-1l.9-13.4Z" fill="currentColor" opacity=".92"/>
+      <path d="M9.4 13.1 18.9 6.8c.5-.3.9.3.5.7l-8 7.3c-.3.3-.5.7-.5 1.1l-.2 2.2c0 .7-1 .8-1.2.1l-1.3-4.2c-.2-.6.1-1.2.7-1.5Z" fill="currentColor" opacity=".55"/>
+    </svg>`,
+    revolut: `<svg class="ico" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M6.4 18.8V5.2h7.7c3.2 0 5.1 1.8 5.1 4.5 0 2.1-1.1 3.6-3.1 4.2l3.1 4.9h-3.1l-2.8-4.4H9.2v4.4H6.4Zm2.8-6.9h4.6c1.5 0 2.4-.8 2.4-2.1 0-1.3-.9-2.1-2.4-2.1H9.2v4.2Z" fill="currentColor"/>
+    </svg>`,
+    install: `<svg class="ico" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M12 3a1 1 0 0 1 1 1v8.2l2.3-2.3a1 1 0 1 1 1.4 1.4l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 1 1 1.4-1.4L11 12.2V4a1 1 0 0 1 1-1Z" fill="currentColor"/>
+      <path d="M5 14a1 1 0 0 1 1 1v3h12v-3a1 1 0 1 1 2 0v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1Z" fill="currentColor" opacity=".7"/>
+    </svg>`,
+  };
+
+  const setBtnIcon = (btn, iconKey) => {
+    if (!btn || btn.dataset.iconized) return;
+    btn.dataset.iconized = "1";
+    const icon = ICONS[iconKey];
+    if (!icon) return;
+
+    // keep text for i18n updates: wrap text into span
+    const txt = document.createElement("span");
+    txt.className = "btnText";
+    txt.textContent = btn.textContent.trim();
+    btn.textContent = "";
+    btn.insertAdjacentHTML("afterbegin", icon);
+    btn.appendChild(txt);
+  };
+
+  // =========================
+  // Config
+  // =========================
   const cfg = {
-    telegramChat: "https://t.me/k2camperbox",
+    telegram: "https://t.me/k2camperbox",
     telegramUsername: "@k2camperbox",
     phone: "+4916096527272",
     email: "k2camperbox@gmail.com",
-    projectName: "K2 CamperBox"
+    projectName: "K2 CamperBox",
   };
 
-  // ===== i18n
+  // =========================
+  // i18n
+  // =========================
   const i18n = {
     de: {
       nav_models:"Modelle", nav_packages:"Pakete", nav_gallery:"Galerie", nav_faq:"FAQ", nav_contact:"Kontakt",
-      nav_cfg:"Konfigurator", nav_cab:"Cabinet",
       hero_badge:"🇩🇪 Kassel • Deutschland • Lieferung/Einbau",
       hero_title:"K2 CamperBox — dein Auto in 5 Minuten zum Camper",
       hero_lead:"Modulares Camping-System für Hochdachkombis (Caddy / Berlingo / Combo / Doblo / Tourneo / …). Schnell anfragen in Telegram + bequeme Bezahlung über Revolut QR.",
@@ -47,8 +287,8 @@
       pkg_2_name:"Comfort", pkg_2_a:"Mehr Stauraum + Orga", pkg_2_b:"Matratze / Polster-Set", pkg_2_c:"Option: Auszug-Tisch",
       pkg_3_name:"Pro", pkg_3_a:"Küchen-Modul + Wasser", pkg_3_b:"12V / Power-Optionen", pkg_3_c:"Individuelle Anpassung",
       pkg_btn:"Anfragen",
-      gallery_title:"Galerie (Platzhalter)", gallery_sub:"Tausche diese Bilder gegen deine echten Fotos (siehe Anleitung unten).",
-      gallery_note:"Foto-Dateien: /assets/gallery-1.jpg … /assets/gallery-4.jpg (du kannst deine hochladen).",
+      gallery_title:"Galerie", gallery_sub:"Lokale Fotos (offline) — tippe zum Vergrößern.",
+      gallery_note:"Foto-Dateien: /assets/gallery-1.jpg … /assets/gallery-6.jpg (du kannst deine hochladen).",
       faq_title:"FAQ", faq_sub:"Kurz & ehrlich — für Einsteiger.",
       faq_q1:"Wie schnell kann ich bestellen?", faq_a1:"Schreib in Telegram, wir klären Auto + Optionen. Danach bekommst du Preis & срок.",
       faq_q2:"Kann ich mit Revolut bezahlen?", faq_a2:"Ja. Klicke „Revolut QR bezahlen“ — QR öffnet sich. In Revolut scannen und zahlen.",
@@ -60,18 +300,22 @@
       pay_to:"Empfänger:", pay_note:"Kommentar:", pay_replace:"Wichtig: Das ist ein Demo-QR. Ersetze /assets/revolut-qr.png mit deinem echten Revolut-QR.",
       pay_download:"QR herunterladen", pay_close:"Schließen",
       toast_copied:"Kopiert ✅",
-      toast_installed:"Installiert ✅",
-      toast_install_hint:"Chrome → Menü → App installieren",
       form_title:"Anfrage-Formular",
       form_sub:"Sende Anfrage direkt in Google Sheets (Apps Script).",
       f_name:"Name", f_phone:"Telefon", f_email:"Email", f_car:"Auto/Modell", f_msg:"Nachricht",
       f_send:"In Sheets senden", f_open_crm:"Mini-CRM öffnen", f_send_tg:"Oder in Telegram senden",
       f_hint:"Damit das Formular funktioniert: Apps Script URL in crm-config.js eintragen. Sonst nutze Telegram.",
-      mob_request:"Anfrage", mob_pay:"QR", mob_cfg:"LEGO", mob_cab:"Cabinet"
+      nav_cfg:"Konfigurator",
+      nav_cab:"Cabinet",
+      mob_request:"Anfrage",
+      mob_pay:"QR",
+      mob_cfg:"LEGO",
+      mob_cab:"Cabinet",
+      lb_open:"Galerie",
+      lb_close:"Schließen",
     },
     ua: {
       nav_models:"Авто", nav_packages:"Пакети", nav_gallery:"Галерея", nav_faq:"FAQ", nav_contact:"Контакти",
-      nav_cfg:"Конфігуратор", nav_cab:"Кабінет",
       hero_badge:"🇩🇪 Кассель • Німеччина • Доставка/монтаж",
       hero_title:"K2 CamperBox — перетвори авто на кемпер за 5 хвилин",
       hero_lead:"Модульна система для мінівенів/«каблучків» (Caddy / Berlingo / Combo / Doblo / Tourneo / …). Швидка заявка в Telegram + оплата через Revolut QR.",
@@ -93,8 +337,8 @@
       pkg_2_name:"Comfort", pkg_2_a:"Більше зберігання + органайзери", pkg_2_b:"Матрац / комплект подушок", pkg_2_c:"Опція: висувний столик",
       pkg_3_name:"Pro", pkg_3_a:"Кухонний модуль + вода", pkg_3_b:"12V / енергетичні опції", pkg_3_c:"Індивідуальна адаптація",
       pkg_btn:"Запитати",
-      gallery_title:"Галерея (плейсхолдер)", gallery_sub:"Заміни ці картинки на свої фото (див. інструкцію нижче).",
-      gallery_note:"Файли фото: /assets/gallery-1.jpg … /assets/gallery-4.jpg (можеш залити свої).",
+      gallery_title:"Галерея", gallery_sub:"Локальні фото (офлайн) — натисни для перегляду.",
+      gallery_note:"Файли фото: /assets/gallery-1.jpg … /assets/gallery-6.jpg (можеш залити свої).",
       faq_title:"FAQ", faq_sub:"Коротко і по-людськи — для новачків.",
       faq_q1:"Як швидко можна замовити?", faq_a1:"Напиши в Telegram, уточнимо авто + опції. Потім ціна і строки.",
       faq_q2:"Можна оплатити через Revolut?", faq_a2:"Так. Натисни «Оплатити Revolut QR» — відкриється QR. Скануй у Revolut і плати.",
@@ -106,18 +350,22 @@
       pay_to:"Одержувач:", pay_note:"Коментар:", pay_replace:"Важливо: це демо QR. Заміни /assets/revolut-qr.png на твій реальний QR з Revolut.",
       pay_download:"Завантажити QR", pay_close:"Закрити",
       toast_copied:"Скопійовано ✅",
-      toast_installed:"Встановлено ✅",
-      toast_install_hint:"Chrome → Меню → Встановити додаток",
       form_title:"Форма заявки",
       form_sub:"Надсилає заявку в Google Sheets (через Apps Script).",
       f_name:"Імʼя", f_phone:"Телефон", f_email:"Email", f_car:"Авто/модель", f_msg:"Повідомлення",
       f_send:"Надіслати в Sheets", f_open_crm:"Відкрити Mini-CRM", f_send_tg:"Або надіслати в Telegram",
       f_hint:"Щоб форма працювала: встав Apps Script URL у crm-config.js. Якщо не налаштовано — використовуй Telegram.",
-      mob_request:"Заявка", mob_pay:"QR", mob_cfg:"LEGO", mob_cab:"Кабінет"
+      nav_cfg:"Конфігуратор",
+      nav_cab:"Кабінет",
+      mob_request:"Заявка",
+      mob_pay:"QR",
+      mob_cfg:"LEGO",
+      mob_cab:"Кабінет",
+      lb_open:"Галерея",
+      lb_close:"Закрити",
     },
     ru: {
       nav_models:"Авто", nav_packages:"Пакеты", nav_gallery:"Галерея", nav_faq:"FAQ", nav_contact:"Контакты",
-      nav_cfg:"Конфигуратор", nav_cab:"Кабинет",
       hero_badge:"🇩🇪 Кассель • Германия • Доставка/установка",
       hero_title:"K2 CamperBox — превращаем авто в кемпер за 5 минут",
       hero_lead:"Модульная система для «каблучков» и компактных ванов (Caddy / Berlingo / Combo / Doblo / Tourneo / …). Быстрая заявка в Telegram + оплата через Revolut QR.",
@@ -139,8 +387,8 @@
       pkg_2_name:"Comfort", pkg_2_a:"Больше хранения + организация", pkg_2_b:"Матрас / комплект подушек", pkg_2_c:"Опция: выдвижной столик",
       pkg_3_name:"Pro", pkg_3_a:"Кухонный модуль + вода", pkg_3_b:"12V / питание", pkg_3_c:"Индивидуальная подгонка",
       pkg_btn:"Узнать цену",
-      gallery_title:"Галерея (заглушка)", gallery_sub:"Поменяй эти картинки на свои фото (см. инструкцию ниже).",
-      gallery_note:"Файлы фото: /assets/gallery-1.jpg … /assets/gallery-4.jpg (можешь загрузить свои).",
+      gallery_title:"Галерея", gallery_sub:"Локальные фото (офлайн) — нажми для просмотра.",
+      gallery_note:"Файлы фото: /assets/gallery-1.jpg … /assets/gallery-6.jpg (можешь загрузить свои).",
       faq_title:"FAQ", faq_sub:"Коротко и по-человечески — для чайника.",
       faq_q1:"Как быстро можно заказать?", faq_a1:"Напиши в Telegram, уточним авто + опции. Потом цена и сроки.",
       faq_q2:"Можно оплатить Revolut?", faq_a2:"Да. Нажми «Оплата Revolut QR» — откроется окно с QR. Сканируешь в Revolut и оплачиваешь.",
@@ -151,163 +399,55 @@
       pay_title:"Оплата Revolut QR", pay_hint:"Открой Revolut → Scan → наведи на QR → оплати.",
       pay_to:"Получатель:", pay_note:"Комментарий:", pay_replace:"Важно: это демо QR. Замени /assets/revolut-qr.png на свой реальный QR из Revolut.",
       pay_download:"Скачать QR", pay_close:"Закрыть",
-      toast_copied:"Скопировано ✅",
-      toast_installed:"Установлено ✅",
-      toast_install_hint:"Chrome → Меню → Установить приложение",
+      toast_copied:"Скопировано ✅"
+      ,
       form_title:"Форма заявки",
-      form_sub:"Отправляет заявку в Google Sheets (через Apps Script).",
+      form_sub:"Отправка заявки в Google Sheets (через Apps Script).",
       f_name:"Имя", f_phone:"Телефон", f_email:"Email", f_car:"Авто/модель", f_msg:"Сообщение",
       f_send:"Отправить в Sheets", f_open_crm:"Открыть Mini-CRM", f_send_tg:"Или отправить в Telegram",
       f_hint:"Чтобы форма работала: вставь Apps Script URL в crm-config.js. Если не настроено — используй Telegram.",
-      mob_request:"Заявка", mob_pay:"QR", mob_cfg:"LEGO", mob_cab:"Кабинет"
-    }
+      nav_cfg:"Конфигуратор",
+      nav_cab:"Кабинет",
+      mob_request:"Заявка",
+      mob_pay:"QR",
+      mob_cfg:"LEGO",
+      mob_cab:"Кабинет",
+      lb_open:"Галерея",
+      lb_close:"Закрыть",
+    },
   };
 
-  // ===== Utils
-  const getLang = () => localStorage.getItem("k2_lang") || "de";
-  const t = (key) => i18n[getLang()]?.[key] ?? i18n.de[key] ?? key;
+  const setLang = (lang) => {
+    document.documentElement.lang = lang === "ua" ? "uk" : lang;
 
-  const toast = (msg) => {
-    let el = $("#toast");
-    if (!el) {
-      el = document.createElement("div");
-      el.id = "toast";
-      el.style.cssText = [
-        "position:fixed",
-        "left:50%",
-        "bottom:22px",
-        "transform:translateX(-50%)",
-        "padding:10px 12px",
-        "border-radius:14px",
-        "border:1px solid rgba(90,120,255,.28)",
-        "background:rgba(10,15,34,.78)",
-        "backdrop-filter: blur(10px)",
-        "-webkit-backdrop-filter: blur(10px)",
-        "box-shadow: 0 10px 30px rgba(0,0,0,.35)",
-        "font-weight:800",
-        "z-index:9999",
-        "opacity:0",
-        "transition:opacity .16s ease",
-        "pointer-events:none",
-        "color:#fff",
-        "letter-spacing:.2px"
-      ].join(";");
-      document.body.appendChild(el);
-    }
-    el.textContent = msg;
-    el.style.opacity = "1";
-    clearTimeout(toast._tm);
-    toast._tm = setTimeout(() => (el.style.opacity = "0"), 1400);
-  };
-
-  const isStandalone = () => {
-    // Android/Chrome: display-mode standalone
-    const dm = window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
-    // iOS Safari installed
-    const ios = (window.navigator && 'standalone' in window.navigator) ? window.navigator.standalone : false;
-    return !!(dm || ios);
-  };
-
-  const hideInstallButton = () => {
-    const b = $("#btnInstall");
-    if (!b) return;
-    b.style.display = "none";
-    b.setAttribute("aria-hidden", "true");
-    b.disabled = true;
-  };
-
-  const showInstallButton = () => {
-    const b = $("#btnInstall");
-    if (!b) return;
-    b.style.display = "";
-    b.removeAttribute("aria-hidden");
-    b.disabled = false;
-  };
-
-  // ===== Premium icons (inline SVG, very light)
-  const ICONS = {
-    tg: `<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path fill="currentColor" d="M9.78 15.82 9.5 19.7c.4 0 .58-.17.79-.38l1.9-1.8 3.94 2.89c.72.4 1.23.19 1.41-.66l2.56-12c.23-1.05-.38-1.46-1.08-1.2L3.1 9.5c-1.02.4-1 .98-.18 1.24l4.06 1.27 9.4-5.93c.44-.27.85-.12.52.15l-7.6 6.59.48 3z"/></svg>`,
-    qr: `<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path fill="currentColor" d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm10-2h2v2h-2v-2zm-2 0h2v4h-2v-4zm4 0h4v4h-4v-4zm0 6h2v2h-2v-2zm2 0h2v2h-2v-2zm-6-2h2v4h-2v-4z"/></svg>`,
-    install: `<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 3a1 1 0 0 1 1 1v8.59l2.3-2.3a1 1 0 1 1 1.4 1.42l-4 4a1 1 0 0 1-1.4 0l-4-4A1 1 0 1 1 8.7 10.3l2.3 2.3V4a1 1 0 0 1 1-1zM5 19a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H6a1 1 0 0 1-1-1z"/></svg>`
-  };
-
-  const injectButtonIcon = (btn, svg, labelKey) => {
-    if (!btn) return;
-    // Keep existing text from i18n later: we wrap icon + label in spans
-    btn.dataset.labelKey = btn.dataset.labelKey || labelKey || "";
-    if (btn.dataset.iconInjected === "1") return;
-    btn.dataset.iconInjected = "1";
-    const label = btn.textContent.trim();
-    btn.innerHTML = `<span class="btnIco" aria-hidden="true" style="display:inline-flex;align-items:center;justify-content:center">${svg}</span><span class="btnTxt">${label}</span>`;
-    // minimal inline styling for consistent spacing (if CSS doesn’t have it yet)
-    btn.style.gap = btn.style.gap || "10px";
-    btn.style.display = btn.style.display || "inline-flex";
-    btn.style.alignItems = btn.style.alignItems || "center";
-    btn.style.justifyContent = btn.style.justifyContent || "center";
-  };
-
-  // ===== Ripple micro-animation (fast, no layout thrash)
-  const enableRipple = () => {
-    const buttons = $$(".btn, .contactCard.pay");
-    buttons.forEach((el) => {
-      if (el.dataset.ripple === "1") return;
-      el.dataset.ripple = "1";
-      el.style.position = el.style.position || "relative";
-      el.style.overflow = el.style.overflow || "hidden";
-
-      el.addEventListener("pointerdown", (e) => {
-        // only primary click/tap
-        if (e.button && e.button !== 0) return;
-
-        const rect = el.getBoundingClientRect();
-        const x = (e.clientX || (rect.left + rect.width / 2)) - rect.left;
-        const y = (e.clientY || (rect.top + rect.height / 2)) - rect.top;
-
-        const ripple = document.createElement("span");
-        const size = Math.max(rect.width, rect.height) * 1.2;
-
-        ripple.style.cssText = [
-          "position:absolute",
-          `left:${x - size / 2}px`,
-          `top:${y - size / 2}px`,
-          `width:${size}px`,
-          `height:${size}px`,
-          "border-radius:999px",
-          "background:rgba(255,255,255,.18)",
-          "transform:scale(0)",
-          "opacity:1",
-          "pointer-events:none",
-          "transition:transform .45s ease, opacity .55s ease"
-        ].join(";");
-
-        el.appendChild(ripple);
-        // trigger
-        requestAnimationFrame(() => {
-          ripple.style.transform = "scale(1)";
-          ripple.style.opacity = "0";
-        });
-        setTimeout(() => ripple.remove(), 650);
-      }, { passive: true });
+    $$(".chip").forEach((b) => {
+      const on = b.dataset.lang === lang;
+      b.classList.toggle("active", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
     });
+
+    $$("[data-i18n]").forEach((el) => {
+      const key = el.getAttribute("data-i18n");
+      const v = i18n[lang]?.[key];
+      if (typeof v === "string") {
+        // if button has .btnText, update that, not replacing icons
+        const bt = el.classList.contains("btn") ? el.querySelector(".btnText") : null;
+        if (bt) bt.textContent = v;
+        else el.textContent = v;
+      }
+    });
+
+    localStorage.setItem("k2_lang", lang);
+
+    // update lightbox texts if open
+    updateLightboxTexts();
   };
 
-  // ===== Telegram with prefilled text (best UX)
-  const openTelegramShare = async (text) => {
-    // Try clipboard (quiet)
-    try { await navigator.clipboard.writeText(text); } catch {}
-
-    // Telegram share endpoint (works on mobile + desktop)
-    const shareUrl = "https://t.me/share/url?url=" + encodeURIComponent(location.origin) + "&text=" + encodeURIComponent(text);
-    // fallback: open chat
-    const fallback = cfg.telegramChat;
-
-    // Some browsers block window.open without user gesture; this is called from click handlers
-    const w = window.open(shareUrl, "_blank", "noopener");
-    if (!w) window.open(fallback, "_blank", "noopener");
-  };
-
+  // =========================
+  // Telegram
+  // =========================
   const buildMessage = (pkg) => {
-    const model  = ($("#carModel")?.value || "").trim();
+    const model = ($("#carModel")?.value || "").trim();
     const wishes = ($("#wishes")?.value || "").trim();
     const lines = [
       `👋 ${cfg.projectName} Anfrage`,
@@ -317,287 +457,368 @@
       `📞 Telefon: ${cfg.phone}`,
       `✉️ Email: ${cfg.email}`,
       `—`,
-      `Bitte цену/срок + что нужно для заказа.`
+      `Bitte цену/срок + что нужно для заказа.`,
     ].filter(Boolean);
     return lines.join("\n");
   };
 
-  const setLang = (lang) => {
-    document.documentElement.lang = (lang === "ua") ? "uk" : lang;
-
-    $$(".chip").forEach((b) => {
-      const on = (b.dataset.lang === lang);
-      b.classList.toggle("active", on);
-      b.setAttribute("aria-pressed", on ? "true" : "false");
-    });
-
-    $$("[data-i18n]").forEach((el) => {
-      const key = el.getAttribute("data-i18n");
-      const v = i18n[lang]?.[key];
-      if (typeof v === "string") el.textContent = v;
-    });
-
-    // Re-apply labels inside icon buttons (because we replaced HTML)
-    // Read desired label from current text nodes via i18n keys
-    const btnRequest = $("#btnRequest");
-    const btnPay     = $("#btnPay");
-    const btnInstall = $("#btnInstall");
-
-    if (btnRequest) {
-      const label = t("cta_request");
-      const txt = btnRequest.querySelector(".btnTxt");
-      if (txt) txt.textContent = label;
-      else btnRequest.textContent = label;
-    }
-    if (btnPay) {
-      const label = t("cta_pay");
-      const txt = btnPay.querySelector(".btnTxt");
-      if (txt) txt.textContent = label;
-      else btnPay.textContent = label;
-    }
-    if (btnInstall) {
-      const label = t("cta_install");
-      const txt = btnInstall.querySelector(".btnTxt");
-      if (txt) txt.textContent = label;
-      else btnInstall.textContent = label;
-    }
-
-    localStorage.setItem("k2_lang", lang);
+  const openTelegram = async (text) => {
+    // Copy + open chat (most compatible)
+    try { await navigator.clipboard?.writeText(text); } catch (_) {}
+    // optional toast for clarity
+    const lang = localStorage.getItem("k2_lang") || "de";
+    toast(i18n[lang]?.toast_copied || "Copied ✅");
+    window.open(cfg.telegram, "_blank", "noopener");
   };
 
-  // ===== Modal
+  // =========================
+  // Pay modal (existing #payModal)
+  // =========================
   const modal = $("#payModal");
-  const openPay  = () => { if(modal){ modal.classList.add("show"); modal.setAttribute("aria-hidden","false"); } };
-  const closePay = () => { if(modal){ modal.classList.remove("show"); modal.setAttribute("aria-hidden","true"); } };
+  const openPay = () => { if (!modal) return; modal.classList.add("show"); modal.setAttribute("aria-hidden", "false"); };
+  const closePay = () => { if (!modal) return; modal.classList.remove("show"); modal.setAttribute("aria-hidden", "true"); };
 
-  // ===== PWA install (fixed)
+  // =========================
+  // PWA install (hide when installed)
+  // =========================
   let deferredPrompt = null;
 
   const updateInstallVisibility = () => {
-    // If already installed/standalone -> hide install button
+    const btn = $("#btnInstall");
+    if (!btn) return;
+    // if installed -> hide
     if (isStandalone()) {
-      hideInstallButton();
+      btn.classList.add("k2Hidden");
       return;
     }
-    // Not standalone: only show if we actually have deferredPrompt (Chrome/Edge)
-    if (deferredPrompt) showInstallButton();
-    else {
-      // keep visible as "hint" OR hide for premium look
-      // premium: hide until prompt appears
-      hideInstallButton();
+    // if not installed but no prompt -> keep subtle (ghost) or hide; choose hide to avoid confusion
+    if (!deferredPrompt) {
+      btn.classList.add("k2Hidden");
+      return;
     }
+    // available
+    btn.classList.remove("k2Hidden");
   };
 
   window.addEventListener("beforeinstallprompt", (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    // show button now (premium: only when available)
-    showInstallButton();
+    // show button only when prompt is available and not installed
     updateInstallVisibility();
   });
 
   window.addEventListener("appinstalled", () => {
     deferredPrompt = null;
-    hideInstallButton();
-    toast(t("toast_installed"));
+    updateInstallVisibility();
+    toast("Installed ✅");
   });
-
-  // Also react when display-mode changes (some browsers)
-  if (window.matchMedia) {
-    const mq = window.matchMedia("(display-mode: standalone)");
-    mq.addEventListener?.("change", () => updateInstallVisibility());
-  }
 
   const installApp = async () => {
-    if (isStandalone()) { hideInstallButton(); return; }
-
+    if (isStandalone()) { updateInstallVisibility(); return; }
     if (!deferredPrompt) {
-      toast(t("toast_install_hint"));
+      toast("Chrome → Menü → App installieren");
       return;
     }
-
-    try {
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice.catch(() => {});
-    } finally {
-      deferredPrompt = null;
-      // If user installed -> appinstalled event will hide button; if not -> hide (premium)
-      updateInstallVisibility();
-    }
+    deferredPrompt.prompt();
+    try { await deferredPrompt.userChoice; } catch (_) {}
+    deferredPrompt = null;
+    updateInstallVisibility();
   };
 
-  // ===== Init
-  const savedLang = getLang();
-  setLang(savedLang);
+  // =========================
+  // Local Gallery + Lightbox
+  // =========================
+  let lb = null;
+  let lbIdx = 0;
+  const galleryImages = [
+    { src: "/assets/gallery-1.jpg", title: "K2 CamperBox — Foto 1" },
+    { src: "/assets/gallery-2.jpg", title: "K2 CamperBox — Foto 2" },
+    { src: "/assets/gallery-3.jpg", title: "K2 CamperBox — Foto 3" },
+    { src: "/assets/gallery-4.jpg", title: "K2 CamperBox — Foto 4" },
+    { src: "/assets/gallery-5.jpg", title: "K2 CamperBox — Foto 5" },
+    { src: "/assets/gallery-6.jpg", title: "K2 CamperBox — Foto 6" },
+  ];
 
-  // Footer year (safe)
-  const y = $("#y");
-  if (y) y.textContent = String(new Date().getFullYear());
+  const ensureLightbox = () => {
+    if (lb) return lb;
+    lb = document.createElement("div");
+    lb.className = "k2Lightbox";
+    lb.innerHTML = `
+      <div class="k2LightboxBack" data-close></div>
+      <div class="k2LightboxCard" role="dialog" aria-modal="true" aria-labelledby="k2LbTitle">
+        <div class="k2LbTop">
+          <div class="k2LbTitle" id="k2LbTitle">Gallery</div>
+          <button class="k2LbBtn" type="button" data-close>✕</button>
+        </div>
+        <div class="k2LbBody">
+          <img class="k2LbImg" alt="Gallery image" />
+          <div class="k2LbNav" aria-hidden="true">
+            <button class="k2LbArrow" type="button" data-prev>‹</button>
+            <button class="k2LbArrow" type="button" data-next>›</button>
+          </div>
+          <div class="k2LbHint">
+            <span data-hint-left>← / →</span>
+            <span data-hint-right>Esc</span>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(lb);
 
-  // Icons inside main CTA buttons
-  injectButtonIcon($("#btnRequest"), ICONS.tg, "cta_request");
-  injectButtonIcon($("#btnPay"),     ICONS.qr, "cta_pay");
-  injectButtonIcon($("#btnInstall"), ICONS.install, "cta_install");
-
-  // Enable ripple across buttons/cards
-  enableRipple();
-
-  // ===== Events (hero)
-  $("#btnRequest")?.addEventListener("click", () => openTelegramShare(buildMessage(null)));
-  $("#btnSend")?.addEventListener("click",    () => openTelegramShare(buildMessage(null)));
-
-  $("#btnCopy")?.addEventListener("click", async () => {
-    const text = buildMessage(null);
-    try {
-      await navigator.clipboard.writeText(text);
-      toast(t("toast_copied"));
-    } catch {
-      toast("Copy failed");
-    }
-  });
-
-  // Package buttons
-  $$(".priceCard .btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const pkg = btn.getAttribute("data-pkg") || null;
-      openTelegramShare(buildMessage(pkg));
+    lb.addEventListener("click", (e) => {
+      const t = e.target;
+      if (!t) return;
+      if (t.matches("[data-close]") || t.closest("[data-close]")) closeLightbox();
     });
-  });
 
-  // Pay modal
-  $("#btnPay")?.addEventListener("click", openPay);
-  $("#btnPay2")?.addEventListener("click", openPay);
-  $("#mobPay")?.addEventListener("click", openPay);
+    $("[data-prev]", lb)?.addEventListener("click", () => showLightbox(lbIdx - 1));
+    $("[data-next]", lb)?.addEventListener("click", () => showLightbox(lbIdx + 1));
 
-  modal?.addEventListener("click", (e) => {
-    const tEl = e.target;
-    if (tEl && (tEl.matches("[data-close]") || tEl.closest("[data-close]"))) closePay();
-  });
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && modal?.classList.contains("show")) closePay();
-  });
-
-  // Install
-  $("#btnInstall")?.addEventListener("click", installApp);
-
-  // Language
-  $$(".chip").forEach((b) => b.addEventListener("click", () => setLang(b.dataset.lang)));
-
-  // Initial install button state
-  updateInstallVisibility();
-
-  // ===== Service Worker (safe, relative)
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("./sw.js").catch(() => {});
+    document.addEventListener("keydown", (e) => {
+      if (!lb.classList.contains("show")) return;
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowLeft") showLightbox(lbIdx - 1);
+      if (e.key === "ArrowRight") showLightbox(lbIdx + 1);
     });
-  }
-})();
 
+    return lb;
+  };
 
-/* Lead form -> Apps Script (submitLead) */
-(() => {
-  'use strict';
+  const updateLightboxTexts = () => {
+    if (!lb) return;
+    const lang = localStorage.getItem("k2_lang") || "de";
+    const titleEl = $("#k2LbTitle", lb);
+    if (titleEl) titleEl.textContent = i18n[lang]?.lb_open || "Gallery";
+    const closeBtn = $("[data-close].k2LbBtn", lb);
+    if (closeBtn) closeBtn.setAttribute("aria-label", i18n[lang]?.lb_close || "Close");
+  };
 
-  const cfg = window.K2_CRM || {};
-  const scriptUrl = (cfg.SCRIPT_URL || "").replace(/\/$/, "");
-  const form = document.getElementById("leadForm");
-  const btn = document.getElementById("btnSubmitLead");
-  const sendTg = document.getElementById("btnSendTg2");
+  const showLightbox = (index) => {
+    ensureLightbox();
+    const total = galleryImages.length;
+    lbIdx = (index + total) % total;
+    const img = $(".k2LbImg", lb);
+    const title = $("#k2LbTitle", lb);
+    const current = galleryImages[lbIdx];
+    if (img) img.src = current.src;
+    if (img) img.alt = current.title || "Gallery";
+    if (title) title.textContent = current.title || (i18n[localStorage.getItem("k2_lang") || "de"]?.lb_open || "Gallery");
 
-  const toast = (msg) => {
-    let el = document.getElementById("toast");
-    if (!el) {
-      el = document.createElement("div");
-      el.id = "toast";
-      el.style.cssText = [
-        "position:fixed",
-        "left:50%",
-        "bottom:22px",
-        "transform:translateX(-50%)",
-        "padding:10px 12px",
-        "border-radius:14px",
-        "border:1px solid rgba(90,120,255,.28)",
-        "background:rgba(10,15,34,.78)",
-        "backdrop-filter: blur(10px)",
-        "-webkit-backdrop-filter: blur(10px)",
-        "box-shadow: 0 10px 30px rgba(0,0,0,.35)",
-        "font-weight:800",
-        "z-index:9999",
-        "opacity:0",
-        "transition:opacity .16s ease",
-        "pointer-events:none",
-        "color:#fff",
-        "letter-spacing:.2px"
-      ].join(";");
-      document.body.appendChild(el);
+    lb.classList.add("show");
+    // bind ripple inside lightbox buttons too
+    bindRipple();
+  };
+
+  const closeLightbox = () => {
+    if (!lb) return;
+    lb.classList.remove("show");
+  };
+
+  const initGallery = () => {
+    const gallery = $(".gallery");
+    if (!gallery) return;
+
+    // Ensure 6 shots (create missing)
+    let shots = $$(".gallery .shot");
+    const need = 6 - shots.length;
+    for (let i = 0; i < need; i++) {
+      const d = document.createElement("div");
+      d.className = "shot";
+      gallery.appendChild(d);
     }
-    el.textContent = msg;
-    el.style.opacity = "1";
-    clearTimeout(toast._tm);
-    toast._tm = setTimeout(() => (el.style.opacity = "0"), 1400);
-  };
+    shots = $$(".gallery .shot");
 
-  const lang = () => (localStorage.getItem("k2_lang") || "de");
+    // Map local assets and make clickable (as button-like)
+    shots.slice(0, 6).forEach((el, idx) => {
+      el.style.backgroundImage = `url("${galleryImages[idx].src}")`;
+      el.style.backgroundSize = "cover";
+      el.style.backgroundPosition = "center";
+      el.style.cursor = "pointer";
+      el.setAttribute("role", "button");
+      el.setAttribute("tabindex", "0");
+      el.setAttribute("aria-label", `Open photo ${idx + 1}`);
 
-  const buildMsgFromForm = () => {
-    const fd = new FormData(form);
-    const obj = Object.fromEntries(fd.entries());
-    const lines = [
-      `👋 K2 CamperBox Anfrage (Form)`,
-      obj.carModel ? `🚗 Auto: ${obj.carModel}` : null,
-      obj.name ? `👤 Name: ${obj.name}` : null,
-      obj.phone ? `📞 Telefon: ${obj.phone}` : null,
-      obj.email ? `✉️ Email: ${obj.email}` : null,
-      obj.message ? `📝 Nachricht: ${obj.message}` : null,
-    ].filter(Boolean);
-    return lines.join("\n");
-  };
+      // subtle overlay for premium feel (no heavy CSS)
+      el.style.border = "1px solid rgba(255,255,255,.10)";
+      el.style.borderRadius = "18px";
+      el.style.boxShadow = "0 18px 50px rgba(0,0,0,.35)";
 
-  const openTelegramShare = async (text) => {
-    try { await navigator.clipboard.writeText(text); } catch {}
-    const shareUrl = "https://t.me/share/url?url=" + encodeURIComponent(location.origin) + "&text=" + encodeURIComponent(text);
-    const w = window.open(shareUrl, "_blank", "noopener");
-    if (!w) window.open("https://t.me/k2camperbox", "_blank", "noopener");
-  };
-
-  if (sendTg) {
-    sendTg.addEventListener("click", () => {
-      if (!form) return;
-      openTelegramShare(buildMsgFromForm());
-    });
-  }
-
-  if (!form) return;
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    if (!scriptUrl || scriptUrl.indexOf("PASTE_") === 0) {
-      toast("Форма не настроена (SCRIPT_URL). Используй Telegram.");
-      return;
-    }
-
-    const fd = new FormData(form);
-    fd.set("lang", lang());
-    fd.set("source", location.href);
-
-    if (btn) btn.disabled = true;
-
-    try {
-      const res = await fetch(scriptUrl + "?action=submitLead", { method: "POST", body: fd });
-      const json = await res.json().catch(() => null);
-
-      if (json && json.ok) {
-        toast("Заявка отправлена ✅");
-        form.reset();
-      } else {
-        toast("Ошибка отправки");
+      if (!el.dataset.lbBound) {
+        el.dataset.lbBound = "1";
+        el.addEventListener("click", () => showLightbox(idx));
+        el.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") showLightbox(idx);
+        });
       }
-    } catch {
-      toast("Ошибка сети/скрипта");
-    } finally {
-      if (btn) btn.disabled = false;
+    });
+
+    // Bind ripple for any new buttons
+    bindRipple();
+  };
+
+  // =========================
+  // Lead form -> Apps Script
+  // =========================
+  const initLeadForm = () => {
+    const cfgCRM = window.K2_CRM || {};
+    const scriptUrl = (cfgCRM.SCRIPT_URL || "").replace(/\/$/, "");
+    const form = $("#leadForm");
+    const btn = $("#btnSubmitLead");
+    const sendTg = $("#btnSendTg2");
+
+    const lang = () => localStorage.getItem("k2_lang") || "de";
+
+    const buildMsgFromForm = () => {
+      if (!form) return `👋 ${cfg.projectName} Anfrage (Form)`;
+      const fd = new FormData(form);
+      const obj = Object.fromEntries(fd.entries());
+      const lines = [
+        `👋 ${cfg.projectName} Anfrage (Form)`,
+        obj.carModel ? `🚗 Auto: ${obj.carModel}` : null,
+        obj.name ? `👤 Name: ${obj.name}` : null,
+        obj.phone ? `📞 Telefon: ${obj.phone}` : null,
+        obj.email ? `✉️ Email: ${obj.email}` : null,
+        obj.message ? `📝 Nachricht: ${obj.message}` : null,
+      ].filter(Boolean);
+      return lines.join("\n");
+    };
+
+    if (sendTg && !sendTg.dataset.bound) {
+      sendTg.dataset.bound = "1";
+      sendTg.addEventListener("click", async () => {
+        const msg = buildMsgFromForm();
+        try { await navigator.clipboard?.writeText(msg); } catch (_) {}
+        toast(i18n[lang()]?.toast_copied || "Copied ✅");
+        window.open(cfg.telegram, "_blank", "noopener");
+      });
     }
-  });
+
+    if (!form || form.dataset.bound) return;
+    form.dataset.bound = "1";
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      if (!scriptUrl || scriptUrl.indexOf("PASTE_") === 0) {
+        toast("Форма не настроена (SCRIPT_URL). Используй Telegram.");
+        return;
+      }
+
+      const fd = new FormData(form);
+      fd.set("lang", lang());
+      fd.set("source", location.href);
+
+      if (btn) btn.disabled = true;
+
+      try {
+        const res = await fetch(scriptUrl + "?action=submitLead", { method: "POST", body: fd });
+        const json = await res.json().catch(() => null);
+        if (json && json.ok) {
+          toast("Заявка отправлена ✅");
+          form.reset();
+        } else {
+          toast("Ошибка отправки");
+        }
+      } catch (_) {
+        toast("Ошибка сети/скрипта");
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    });
+  };
+
+  // =========================
+  // Init
+  // =========================
+  const init = () => {
+    injectPremiumCSS();
+
+    // footer year
+    const y = $("#y");
+    if (y) y.textContent = String(new Date().getFullYear());
+
+    // i18n saved
+    const saved = localStorage.getItem("k2_lang") || "de";
+    setLang(saved);
+
+    // Bind language chips
+    $$(".chip").forEach((b) => {
+      if (b.dataset.bound) return;
+      b.dataset.bound = "1";
+      b.addEventListener("click", () => setLang(b.dataset.lang));
+    });
+
+    // Icons inside buttons (no HTML edits)
+    setBtnIcon($("#btnRequest"), "telegram");
+    setBtnIcon($("#btnSend"), "telegram");
+    setBtnIcon($("#btnSendTg2"), "telegram");
+    setBtnIcon($("#btnPay"), "revolut");
+    setBtnIcon($("#btnPay2"), "revolut");
+    setBtnIcon($("#mobPay"), "revolut");
+    setBtnIcon($("#btnInstall"), "install");
+
+    // bind ripple to existing buttons
+    bindRipple();
+
+    // Telegram actions
+    $("#btnRequest")?.addEventListener("click", () => openTelegram(buildMessage(null)));
+    $("#btnSend")?.addEventListener("click", () => openTelegram(buildMessage(null)));
+
+    $("#btnCopy")?.addEventListener("click", async () => {
+      const text = buildMessage(null);
+      try {
+        await navigator.clipboard.writeText(text);
+        const lang = localStorage.getItem("k2_lang") || "de";
+        toast(i18n[lang]?.toast_copied || "Copied ✅");
+      } catch (_) {
+        toast("Copy failed");
+      }
+    });
+
+    $$(".priceCard .btn").forEach((btn) => {
+      if (btn.dataset.bound) return;
+      btn.dataset.bound = "1";
+      btn.addEventListener("click", () => {
+        const pkg = btn.getAttribute("data-pkg") || null;
+        openTelegram(buildMessage(pkg));
+      });
+    });
+
+    // Pay modal
+    $("#btnPay")?.addEventListener("click", openPay);
+    $("#btnPay2")?.addEventListener("click", openPay);
+    $("#mobPay")?.addEventListener("click", openPay);
+
+    if (modal && !modal.dataset.bound) {
+      modal.dataset.bound = "1";
+      modal.addEventListener("click", (e) => {
+        const t = e.target;
+        if (t && (t.matches("[data-close]") || t.closest("[data-close]"))) closePay();
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && modal.classList.contains("show")) closePay();
+      });
+    }
+
+    // Install button behavior
+    $("#btnInstall")?.addEventListener("click", installApp);
+    // First check visibility on load (important!)
+    updateInstallVisibility();
+
+    // Local gallery + lightbox
+    initGallery();
+
+    // Lead form
+    initLeadForm();
+
+    // Service Worker register
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/sw.js").catch(() => {});
+      });
+    }
+  };
+
+  // Run
+  init();
 })();
